@@ -112,10 +112,18 @@ class ToolExecutor:
             tokens = shlex.split(normalized)
         except ValueError:
             tokens = normalized.split()
-        dangerous_binaries = {"rm", "mkfs", "dd", "shred", "wipefs"}
-        if tokens and tokens[0] in dangerous_binaries:
+        dangerous_always = {"shred", "wipefs"}
+        if tokens and tokens[0] in dangerous_always:
+            raise SecurityViolation(f"Destructive command blocked: {cmd}")
+        if tokens and tokens[0] == "rm":
             flags = {t for t in tokens[1:] if t.startswith("-")}
-            if tokens[0] == "rm" and ("-r" in flags or "-f" in flags or "--recursive" in flags):
+            expanded: set[str] = set()
+            for f in flags:
+                if f.startswith("--"):
+                    expanded.add(f)
+                else:
+                    expanded.update(f"-{ch}" for ch in f[1:])
+            if "-r" in expanded or "-f" in expanded or "--recursive" in expanded:
                 raise SecurityViolation(f"Destructive rm command blocked: {cmd}")
 
     def _execute_bash(self, args: BashExecuteArgs) -> BashExecuteResult:

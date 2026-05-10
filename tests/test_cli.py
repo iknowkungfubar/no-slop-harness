@@ -64,6 +64,13 @@ class TestInitCommand:
     def test_no_overwrite(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.chdir(tmp_path)
         (tmp_path / "harness.toml").write_text("existing")
-        args = type("Args", (), {})()
+        args = type("Args", (), {"config": "harness.toml"})()
         _cmd_init(args)
         assert (tmp_path / "harness.toml").read_text() == "existing"
+
+    def test_custom_config_path(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+        monkeypatch.chdir(tmp_path)
+        args = type("Args", (), {"config": "custom.toml"})()
+        _cmd_init(args)
+        assert (tmp_path / "custom.toml").exists()
+        assert not (tmp_path / "harness.toml").exists()
