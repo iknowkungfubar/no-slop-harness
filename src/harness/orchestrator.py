@@ -6,6 +6,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable
 
 from .agents import Coordinator, Implementor, Verifier
 from .client import InferenceClient
@@ -62,13 +63,12 @@ class Orchestrator:
             self.config, self.repo_path, protect_sdlc=True
         )
         self.coordinator = Coordinator(client)
-        self.implementor = Implementor(client)
         self.verifier = Verifier(client)
         self.worktrees = WorktreeManager(self.repo_path)
         self.context_mgr = ContextManager(self.repo_path)
 
-        self._on_task_start: list = []
-        self._on_task_end: list = []
+        self._on_task_start: list[Callable[[Task], None]] = []
+        self._on_task_end: list[Callable[[TaskResult], None]] = []
 
     def on_task_start(self, callback) -> None:
         """Register a callback invoked when a task begins: ``callback(task)``."""

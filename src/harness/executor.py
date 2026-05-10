@@ -9,8 +9,11 @@ from typing import TYPE_CHECKING
 from .schemas import (
     BashExecuteArgs,
     BashExecuteResult,
+    EditFileAstArgs,
     EditFileAstResult,
+    ReadFileArgs,
     ReadFileResult,
+    WriteFileArgs,
     WriteFileResult,
 )
 from .tools import TOOL_ARGS_MAP, TOOL_REGISTRY, ToolArgs, ToolResult
@@ -70,11 +73,11 @@ class ToolExecutor:
         return handler(parsed)
 
     def _validate(self, name: str, args: ToolArgs) -> None:
-        if name in ("read_file", "write_file", "edit_file_ast"):
-            path_attr = getattr(args, "path", None)
-            if path_attr is not None:
-                self._validate_path(path_attr, writable=name != "read_file")
-        if name == "bash_execute" and isinstance(args, BashExecuteArgs):
+        if isinstance(args, ReadFileArgs):
+            self._validate_path(args.path, writable=False)
+        elif isinstance(args, (WriteFileArgs, EditFileAstArgs)):
+            self._validate_path(args.path, writable=True)
+        elif isinstance(args, BashExecuteArgs):
             self._validate_command(args.cmd)
 
     def _validate_path(self, path: str, *, writable: bool = False) -> None:
@@ -99,9 +102,21 @@ class ToolExecutor:
             raise SecurityViolation(f"Path outside allowed roots: {path}")
 
     def _validate_command(self, cmd: str) -> None:
+        import shlex
+
+        normalized = cmd.strip()
         for blocked in self.config.tools.blocked_commands:
-            if blocked in cmd:
+            if blocked in normalized:
                 raise SecurityViolation(f"Blocked command pattern: {blocked}")
+        try:
+            tokens = shlex.split(normalized)
+        except ValueError:
+            tokens = normalized.split()
+        dangerous_binaries = {"rm", "mkfs", "dd", "shred", "wipefs"}
+        if tokens and tokens[0] in dangerous_binaries:
+            flags = {t for t in tokens[1:] if t.startswith("-")}
+            if tokens[0] == "rm" and ("-r" in flags or "-f" in flags or "--recursive" in flags):
+                raise SecurityViolation(f"Destructive rm command blocked: {cmd}")
 
     def _execute_bash(self, args: BashExecuteArgs) -> BashExecuteResult:
         import subprocess

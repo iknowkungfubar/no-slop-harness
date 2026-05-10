@@ -58,3 +58,16 @@ class TestContextManager:
         cm = ContextManager(tmp_path)
         (cm.context_dir / ".gitkeep").touch()
         assert ".gitkeep" not in cm.list_entries()
+
+    def test_sanitize_task_id(self, tmp_path: Path):
+        cm = ContextManager(tmp_path)
+        path = cm.save_task_summary("../../etc/passwd", "evil", "failed")
+        assert ".." not in path.name
+        assert "/" not in path.name
+        assert path.parent == cm.context_dir
+
+    def test_sanitize_json_name(self, tmp_path: Path):
+        cm = ContextManager(tmp_path)
+        path = cm.save_json("../../../etc/shadow", {"x": 1})
+        assert ".." not in path.name
+        assert path.parent == cm.context_dir

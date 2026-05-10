@@ -158,12 +158,12 @@ class _LiveDisplay:
 
 
 def _cmd_init(args: argparse.Namespace) -> None:
-    path = Path("harness.toml")
+    path = Path(args.config) if hasattr(args, "config") else Path("harness.toml")
     if path.exists():
-        console.print("[yellow]harness.toml already exists.[/yellow]")
+        console.print(f"[yellow]{path} already exists.[/yellow]")
         return
     path.write_text(default_toml())
-    console.print("[green]Created harness.toml[/green]")
+    console.print(f"[green]Created {path}[/green]")
 
 
 def _cmd_info(config: HarnessConfig) -> None:
@@ -223,7 +223,7 @@ def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
 
-    config = load_config(args.config if hasattr(args, "config") else None)
+    config = load_config(args.config)
     _setup_logging(config, args.verbose)
 
     if args.command == "init":

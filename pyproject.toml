@@ -1,10 +1,10 @@
 [project]
 name = "no-slop-harness"
-version = "0.2.0"
+version = "0.2.1"
 description = "Deterministic, local-first LLM orchestration framework implementing the CIV pattern"
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",

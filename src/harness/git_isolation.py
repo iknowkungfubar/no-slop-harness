@@ -18,6 +18,9 @@ class Worktree:
     branch: str
     base_branch: str
 
+    def __repr__(self) -> str:
+        return f"Worktree(branch={self.branch!r}, path={self.path})"
+
 
 class WorktreeManager:
     """Creates and manages isolated git worktrees per task."""
@@ -84,7 +87,15 @@ class WorktreeManager:
             return ""
 
     def merge_to_base(self, wt: Worktree) -> bool:
-        """Merge worktree branch into its base branch."""
+        """Merge worktree branch into base without checking out."""
+        try:
+            self._git(
+                "fetch", ".", f"{wt.branch}:{wt.base_branch}",
+            )
+            return True
+        except subprocess.CalledProcessError:
+            pass
+        # Fallback: fast-forward failed, attempt a merge commit
         try:
             self._git("checkout", wt.base_branch)
             self._git("merge", "--no-ff", wt.branch, "-m", f"Merge {wt.branch}")

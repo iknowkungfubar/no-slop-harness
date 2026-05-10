@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,10 +30,16 @@ class ContextManager:
             items.append(json.loads(f.read_text(encoding="utf-8")))
         return items
 
+    @staticmethod
+    def _sanitize_name(name: str) -> str:
+        """Strip path-traversal characters from a context entry name."""
+        return re.sub(r"[^a-zA-Z0-9_\-]", "_", name)
+
     def save_task_summary(
         self, task_id: str, description: str, status: str, log_excerpt: str = ""
     ) -> Path:
         """Write a task execution summary to context dir."""
+        task_id = self._sanitize_name(task_id)
         ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         content = (
             f"# Task: {task_id}\n\n"
@@ -49,6 +56,7 @@ class ContextManager:
 
     def save_json(self, name: str, data: dict) -> Path:
         """Write a JSON context file."""
+        name = self._sanitize_name(name)
         path = self.context_dir / f"{name}.json"
         path.write_text(json.dumps(data, indent=2), encoding="utf-8")
         return path
