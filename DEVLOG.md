@@ -21,3 +21,16 @@ Log significant architectural decisions, environment setup quirks, and resolved 
 *   **Decision:** Made `vllm` an optional dependency (`[server]` extra) since the harness connects via HTTP API.
 *   **Tests:** 25 tests covering schemas, all four tools, and git worktree isolation. All passing.
 *   **Next Steps:** Integration tests with a live inference server; extend `edit_file_ast` to support additional languages.
+
+## [Date: 2026-05-10] - Production Readiness
+*   **Action:** Hardened entire harness for production deployment.
+*   **Config:** Added `harness.toml` configuration via `tomllib` (inference, tools, security, logging sections). `harness init` generates defaults.
+*   **Context:** Built `.sdlc/context/` read/write system — persistent agent memory across sessions (markdown + JSON).
+*   **Security:** `ToolExecutor` wraps all tool calls with path restriction (allowed_roots) and command blocking (blocked_commands).
+*   **Resilience:** `InferenceClient` now retries with exponential backoff, configurable timeouts, and `health_check()` endpoint verification.
+*   **Multi-language AST:** Extended `edit_file_ast` to support JS, TS, Go, Rust via optional `tree-sitter-{lang}` packages.
+*   **Logging:** Configurable log level and format (text/JSON) via config.
+*   **CLI:** Added `--version`, `--config`, `harness init`, `harness verify`, `harness info`. Live TUI during `harness run` via `rich.live`.
+*   **CI:** GitHub Actions workflow (lint + test across Python 3.11/3.12/3.13).
+*   **Tests:** 66 unit + integration tests, all passing. Lint clean.
+*   **Typing:** Added `py.typed` marker for PEP 561 compliance.

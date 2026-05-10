@@ -73,13 +73,13 @@ class TestEditFileAst:
         assert "No AST node" in (result.error or "")
 
     def test_unsupported_extension(self, tmp_dir: Path):
-        f = tmp_dir / "test.rs"
-        f.write_text("fn main() {}")
+        f = tmp_dir / "test.xyz"
+        f.write_text("some content")
         result = edit_file_ast(
             EditFileAstArgs(
                 path=str(f),
-                node_target="(function_item) @target",
-                replacement="fn new_main() {}",
+                node_target="(expression) @target",
+                replacement="new content",
             )
         )
         assert not result.success

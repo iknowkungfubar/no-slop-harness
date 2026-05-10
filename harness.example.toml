@@ -1,0 +1,24 @@
+# Example harness configuration.
+# Copy to harness.toml and edit as needed.
+
+[inference]
+base_url = "http://localhost:8000/v1"  # vLLM / OpenAI-compatible endpoint
+api_key = "not-needed"                 # Set if endpoint requires auth
+model = "default"                      # Model name served by the endpoint
+temperature = 0.0
+max_tokens = 4096
+max_retries = 3
+timeout_seconds = 60
+
+[tools]
+bash_timeout = 60                                              # Seconds
+max_file_size_bytes = 10485760                                 # 10 MB
+blocked_commands = ["rm -rf /", "mkfs", "dd if=/dev/zero", ":(){:|:&};:"]
+
+[security]
+restrict_paths = true
+allowed_roots = ["."]  # Relative to repo root
+
+[logging]
+level = "INFO"     # DEBUG | INFO | WARNING | ERROR
+format = "text"    # "text" or "json"
