@@ -11,7 +11,7 @@ import pytest
 from harness.agents import Coordinator, Implementor, Verifier
 from harness.config import HarnessConfig
 from harness.executor import ToolExecutor
-from harness.orchestrator import Orchestrator
+from harness.orchestrator import CyclicDependencyError, Orchestrator, _topological_sort
 from harness.schemas import (
     AgentAction,
     Task,
@@ -224,3 +224,23 @@ class TestOrchestratorIntegration:
         ctx_file = git_repo / ".sdlc" / "context" / "task_ctx1.md"
         assert ctx_file.exists()
         assert "completed" in ctx_file.read_text()
+
+
+class TestTopologicalSort:
+    def test_cycle_detected(self):
+        tasks = [
+            Task(id="a", description="A", dependencies=["b"]),
+            Task(id="b", description="B", dependencies=["a"]),
+        ]
+        with pytest.raises(CyclicDependencyError, match="Cycle detected"):
+            _topological_sort(tasks)
+
+    def test_valid_dag_sorted(self):
+        tasks = [
+            Task(id="c", description="C", dependencies=["b"]),
+            Task(id="b", description="B", dependencies=["a"]),
+            Task(id="a", description="A"),
+        ]
+        result = _topological_sort(tasks)
+        ids = [t.id for t in result]
+        assert ids.index("a") < ids.index("b") < ids.index("c")

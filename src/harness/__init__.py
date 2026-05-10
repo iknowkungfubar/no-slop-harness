@@ -5,8 +5,8 @@ __version__ = "0.2.0"
 from .client import InferenceClient
 from .config import HarnessConfig, load_config
 from .context import ContextManager
-from .executor import ToolExecutor
-from .orchestrator import Orchestrator, OrchestratorResult, TaskResult
+from .executor import SecurityViolation, ToolExecutor
+from .orchestrator import CyclicDependencyError, Orchestrator, OrchestratorResult, TaskResult
 from .schemas import (
     AgentAction,
     Task,
@@ -19,6 +19,8 @@ from .schemas import (
 __all__ = [
     "AgentAction",
     "ContextManager",
+    "CyclicDependencyError",
+    "SecurityViolation",
     "HarnessConfig",
     "InferenceClient",
     "Orchestrator",

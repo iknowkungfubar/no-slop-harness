@@ -20,17 +20,39 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+SDLC_DIR = ".sdlc"
+
 
 class SecurityViolation(Exception):
     """Raised when a tool call violates security policy."""
 
 
 class ToolExecutor:
-    """Wraps the tool registry with security checks and config enforcement."""
+    """Wraps the tool registry with security checks and config enforcement.
 
-    def __init__(self, config: HarnessConfig, repo_root: str | Path):
+    The ``repo_root`` should be the **working directory** for the current task —
+    typically a git worktree path, not the main repo root. This ensures path
+    validation allows file operations within the worktree.
+    """
+
+    def __init__(
+        self,
+        config: HarnessConfig,
+        repo_root: str | Path,
+        *,
+        protect_sdlc: bool = False,
+    ):
         self.config = config
         self.repo_root = Path(repo_root).resolve()
+        self.protect_sdlc = protect_sdlc
+
+    def with_root(self, new_root: str | Path) -> ToolExecutor:
+        """Return a copy of this executor rooted at *new_root*."""
+        return ToolExecutor(
+            self.config,
+            new_root,
+            protect_sdlc=self.protect_sdlc,
+        )
 
     def execute(self, name: str, arguments: dict) -> ToolResult:
         """Validate and execute a named tool."""
@@ -42,7 +64,6 @@ class ToolExecutor:
         parsed = args_cls(**arguments)
         self._validate(name, parsed)
 
-        # Override bash timeout from config
         if name == "bash_execute" and isinstance(parsed, BashExecuteArgs):
             return self._execute_bash(parsed)
 
@@ -52,16 +73,27 @@ class ToolExecutor:
         if name in ("read_file", "write_file", "edit_file_ast"):
             path_attr = getattr(args, "path", None)
             if path_attr is not None:
-                self._validate_path(path_attr)
+                self._validate_path(path_attr, writable=name != "read_file")
         if name == "bash_execute" and isinstance(args, BashExecuteArgs):
             self._validate_command(args.cmd)
 
-    def _validate_path(self, path: str) -> None:
+    def _validate_path(self, path: str, *, writable: bool = False) -> None:
+        resolved = Path(path).resolve()
+
+        if writable and self.protect_sdlc:
+            try:
+                resolved.relative_to(self.repo_root / SDLC_DIR)
+                raise SecurityViolation(
+                    f"Implementor cannot modify {SDLC_DIR}/ files: {path}"
+                )
+            except ValueError:
+                pass
+
         if not self.config.security.restrict_paths:
             return
-        resolved = Path(path).resolve()
         allowed = [
-            (self.repo_root / r).resolve() for r in self.config.security.allowed_roots
+            (self.repo_root / r).resolve()
+            for r in self.config.security.allowed_roots
         ]
         if not any(_is_subpath(resolved, root) for root in allowed):
             raise SecurityViolation(f"Path outside allowed roots: {path}")

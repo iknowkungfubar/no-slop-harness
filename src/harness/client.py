@@ -105,19 +105,31 @@ class InferenceClient:
                 return completion.choices[0].message.content or ""
             except Exception as e:
                 last_error = e
-                if attempt < self.max_retries:
-                    wait = min(2**attempt, 30)
-                    logger.warning(
-                        "Attempt %d/%d failed (%s), retrying in %ds",
-                        attempt + 1,
-                        self.max_retries + 1,
-                        e,
-                        wait,
-                    )
-                    time.sleep(wait)
+                if not self._is_retryable(e) or attempt >= self.max_retries:
+                    break
+                wait = min(2**attempt, 30)
+                logger.warning(
+                    "Attempt %d/%d failed (%s), retrying in %ds",
+                    attempt + 1,
+                    self.max_retries + 1,
+                    e,
+                    wait,
+                )
+                time.sleep(wait)
         raise RuntimeError(
             f"All {self.max_retries + 1} attempts failed"
         ) from last_error
+
+    @staticmethod
+    def _is_retryable(exc: Exception) -> bool:
+        """Return True for transient errors worth retrying."""
+        from openai import APIConnectionError, APIStatusError, APITimeoutError
+
+        if isinstance(exc, (APIConnectionError, APITimeoutError)):
+            return True
+        if isinstance(exc, APIStatusError) and exc.status_code >= 500:
+            return True
+        return False
 
     @classmethod
     def from_config(cls, config) -> InferenceClient:

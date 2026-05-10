@@ -60,6 +60,52 @@ class TestUnknownTool:
             ex.execute("nonexistent_tool", {})
 
 
+class TestSdlcProtection:
+    def test_write_to_sdlc_blocked(self, repo: Path):
+        (repo / ".sdlc" / "context").mkdir(parents=True)
+        cfg = HarnessConfig(security=SecurityConfig(restrict_paths=False))
+        ex = ToolExecutor(cfg, repo, protect_sdlc=True)
+        with pytest.raises(SecurityViolation, match="cannot modify .sdlc"):
+            ex.execute("write_file", {
+                "path": str(repo / ".sdlc" / "context" / "bad.md"),
+                "content": "evil",
+            })
+
+    def test_read_sdlc_allowed(self, repo: Path):
+        sdlc = repo / ".sdlc" / "context"
+        sdlc.mkdir(parents=True)
+        (sdlc / "note.md").write_text("ok")
+        cfg = HarnessConfig(security=SecurityConfig(restrict_paths=False))
+        ex = ToolExecutor(cfg, repo, protect_sdlc=True)
+        result = ex.execute("read_file", {"path": str(sdlc / "note.md")})
+        assert result.success  # type: ignore[union-attr]
+
+    def test_sdlc_protection_off_by_default(self, repo: Path):
+        (repo / ".sdlc" / "context").mkdir(parents=True)
+        cfg = HarnessConfig(security=SecurityConfig(restrict_paths=False))
+        ex = ToolExecutor(cfg, repo)
+        result = ex.execute("write_file", {
+            "path": str(repo / ".sdlc" / "context" / "ok.md"),
+            "content": "fine",
+        })
+        assert result.success  # type: ignore[union-attr]
+
+
+class TestWithRoot:
+    def test_with_root_changes_root(self, repo: Path):
+        cfg = HarnessConfig(security=SecurityConfig(restrict_paths=True, allowed_roots=["."]))
+        ex = ToolExecutor(cfg, repo, protect_sdlc=True)
+        new_dir = repo / "subdir"
+        new_dir.mkdir()
+        (new_dir / "file.txt").write_text("hi")
+
+        child = ex.with_root(new_dir)
+        assert child.repo_root == new_dir.resolve()
+        assert child.protect_sdlc is True
+        result = child.execute("read_file", {"path": str(new_dir / "file.txt")})
+        assert result.success  # type: ignore[union-attr]
+
+
 class TestErrorResult:
     def test_make_error_result_read(self, repo: Path):
         ex = ToolExecutor(HarnessConfig(), repo)

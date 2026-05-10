@@ -56,10 +56,13 @@ class Orchestrator:
     ):
         self.config = config or HarnessConfig()
         self.repo_path = Path(repo_path).resolve()
+        self.client = client
 
-        executor = ToolExecutor(self.config, self.repo_path)
+        self._base_executor = ToolExecutor(
+            self.config, self.repo_path, protect_sdlc=True
+        )
         self.coordinator = Coordinator(client)
-        self.implementor = Implementor(client, executor=executor)
+        self.implementor = Implementor(client)
         self.verifier = Verifier(client)
         self.worktrees = WorktreeManager(self.repo_path)
         self.context_mgr = ContextManager(self.repo_path)
@@ -119,7 +122,9 @@ class Orchestrator:
         tr = TaskResult(task=task)
 
         with self.worktrees.isolated(task.id) as wt:
-            log = self.implementor.execute(
+            wt_executor = self._base_executor.with_root(wt.path)
+            impl = Implementor(self.client, executor=wt_executor)
+            log = impl.execute(
                 task, context=f"Working directory: {wt.path}\n{context}"
             )
             tr.execution_log = log
@@ -146,20 +151,31 @@ class Orchestrator:
         return tr
 
 
+class CyclicDependencyError(ValueError):
+    """Raised when the task DAG contains a cycle."""
+
+
 def _topological_sort(tasks: list[Task]) -> list[Task]:
-    """Sort tasks respecting dependency order (DFS)."""
+    """Sort tasks respecting dependency order (DFS with cycle detection)."""
     by_id = {t.id: t for t in tasks}
     visited: set[str] = set()
+    in_stack: set[str] = set()
     result: list[Task] = []
 
     def visit(task_id: str) -> None:
         if task_id in visited:
             return
-        visited.add(task_id)
+        if task_id in in_stack:
+            raise CyclicDependencyError(
+                f"Cycle detected involving task '{task_id}'"
+            )
+        in_stack.add(task_id)
         task = by_id[task_id]
         for dep in task.dependencies:
             if dep in by_id:
                 visit(dep)
+        in_stack.discard(task_id)
+        visited.add(task_id)
         result.append(task)
 
     for t in tasks:

@@ -33,7 +33,7 @@ EXTENSION_TO_LANGUAGE: dict[str, str] = {
     ".cjs": "javascript",
     ".jsx": "javascript",
     ".ts": "typescript",
-    ".tsx": "typescript",
+    ".tsx": "tsx",
     ".go": "go",
     ".rs": "rust",
 }
@@ -50,6 +50,7 @@ def _get_language(lang_name: str):
         "python": lambda: __import__("tree_sitter_python").language(),
         "javascript": lambda: __import__("tree_sitter_javascript").language(),
         "typescript": lambda: __import__("tree_sitter_typescript").language_typescript(),
+        "tsx": lambda: __import__("tree_sitter_typescript").language_tsx(),
         "go": lambda: __import__("tree_sitter_go").language(),
         "rust": lambda: __import__("tree_sitter_rust").language(),
     }
@@ -66,7 +67,7 @@ def _get_language(lang_name: str):
 def supported_languages() -> list[str]:
     """Return list of language names with installed tree-sitter grammars."""
     available: list[str] = []
-    for lang in ("python", "javascript", "typescript", "go", "rust"):
+    for lang in ("python", "javascript", "typescript", "tsx", "go", "rust"):
         try:
             _get_language(lang)
             available.append(lang)
