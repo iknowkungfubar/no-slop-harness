@@ -30,7 +30,8 @@ uv venv && uv pip install -e ".[dev]"
 
 ### 1. Security Command Blocking
 
-Test via Python imports — do NOT actually execute dangerous commands:
+Test via Python imports. Commands that SHOULD raise `SecurityViolation` are
+caught before execution and never reach `subprocess.run`:
 
 ```python
 from harness.config import HarnessConfig
@@ -39,15 +40,22 @@ from harness.executor import ToolExecutor, SecurityViolation
 cfg = HarnessConfig()
 ex = ToolExecutor(cfg, '/tmp')
 
-# These should raise SecurityViolation:
+# These SHOULD raise SecurityViolation (blocked before execution):
 ex.execute('bash_execute', {'cmd': 'rm -rf ./data'})       # combined flags
 ex.execute('bash_execute', {'cmd': 'rm -r -f /tmp/data'})   # separated flags
 ex.execute('bash_execute', {'cmd': 'rm --recursive /tmp'})  # long flag
 ex.execute('bash_execute', {'cmd': 'shred /dev/sda'})       # unconditional block
 ex.execute('bash_execute', {'cmd': 'wipefs /dev/sda'})      # unconditional block
+```
 
-# This should NOT raise (plain rm without destructive flags):
-ex.execute('bash_execute', {'cmd': 'rm nonexistent 2>/dev/null; true'})
+**WARNING**: Commands that should NOT raise SecurityViolation WILL actually
+execute via `subprocess.run(shell=True)`. Only use harmless commands in
+"allowed" examples:
+
+```python
+# This should NOT raise — but it WILL execute the command via subprocess.
+# Use only harmless commands here (e.g., echo, true, listing files).
+ex.execute('bash_execute', {'cmd': 'echo safe'})
 ```
 
 ### 2. Context Sanitization
@@ -59,8 +67,12 @@ import tempfile
 with tempfile.TemporaryDirectory() as d:
     cm = ContextManager(d)
     path = cm.save_task_summary('../../etc/passwd', 'evil', 'failed')
-    assert path.parent == cm.context_dir  # must stay inside context dir
+    assert path.resolve().parent == cm.context_dir.resolve()  # must stay inside
     assert '..' not in path.name          # no path traversal chars
+
+    # Deep traversal must also be contained
+    path = cm.save_task_summary('../../../../../../../../tmp/evil', 'deep', 'failed')
+    assert path.resolve().parent == cm.context_dir.resolve()
 ```
 
 ### 3. CLI Commands
@@ -98,3 +110,4 @@ No secrets required for local testing. An inference server endpoint would be nee
 - Configuration is via `harness.toml` (TOML format)
 - The `.sdlc/context/` directory is used for persistent agent memory
 - Security tests should verify both blocking (dangerous commands raise) AND allowing (safe commands pass through)
+- When adding "allowed command" test examples, remember they actually execute — never use destructive commands even if they wouldn't trigger SecurityViolation
