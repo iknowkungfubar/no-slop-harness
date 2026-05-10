@@ -35,6 +35,20 @@ class ContextManager:
         """Strip path-traversal characters from a context entry name."""
         return re.sub(r"[^a-zA-Z0-9_\-]", "_", name)
 
+    def _safe_path(self, filename: str) -> Path:
+        """Build a path inside context_dir and verify it cannot escape.
+
+        Uses strict parent equality (not ``is_relative_to``) so only flat
+        filenames are accepted.  If subdirectory support is ever needed,
+        switch to ``path.is_relative_to(self.context_dir.resolve())``.
+        """
+        path = (self.context_dir / filename).resolve()
+        if not path.parent == self.context_dir.resolve():
+            raise ValueError(
+                f"Path escapes context directory: {filename!r}"
+            )
+        return path
+
     def save_task_summary(
         self, task_id: str, description: str, status: str, log_excerpt: str = ""
     ) -> Path:
@@ -50,14 +64,14 @@ class ContextManager:
         if log_excerpt:
             content += f"\n## Execution Log Excerpt\n```\n{log_excerpt}\n```\n"
 
-        path = self.context_dir / f"task_{task_id}.md"
+        path = self._safe_path(f"task_{task_id}.md")
         path.write_text(content, encoding="utf-8")
         return path
 
     def save_json(self, name: str, data: dict) -> Path:
         """Write a JSON context file."""
         name = self._sanitize_name(name)
-        path = self.context_dir / f"{name}.json"
+        path = self._safe_path(f"{name}.json")
         path.write_text(json.dumps(data, indent=2), encoding="utf-8")
         return path
 

@@ -71,3 +71,29 @@ class TestContextManager:
         path = cm.save_json("../../../etc/shadow", {"x": 1})
         assert ".." not in path.name
         assert path.parent == cm.context_dir
+
+    def test_deep_traversal_task_id(self, tmp_path: Path):
+        """Deep ../ segments must not escape context_dir."""
+        cm = ContextManager(tmp_path)
+        path = cm.save_task_summary(
+            "../../../../../../../../tmp/evil", "deep escape", "failed"
+        )
+        resolved = path.resolve()
+        assert resolved.parent == cm.context_dir.resolve()
+        assert ".." not in str(resolved)
+
+    def test_deep_traversal_json_name(self, tmp_path: Path):
+        """Deep ../ segments in JSON name must not escape context_dir."""
+        cm = ContextManager(tmp_path)
+        path = cm.save_json("../../../../../../../../tmp/evil", {"x": 1})
+        resolved = path.resolve()
+        assert resolved.parent == cm.context_dir.resolve()
+        assert ".." not in str(resolved)
+
+    def test_safe_path_rejects_escape(self, tmp_path: Path):
+        """_safe_path raises ValueError if filename somehow escapes."""
+        cm = ContextManager(tmp_path)
+        import pytest
+
+        with pytest.raises(ValueError, match="escapes context directory"):
+            cm._safe_path("../../escape.md")
