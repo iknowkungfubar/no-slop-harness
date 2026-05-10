@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from .agents import Coordinator, Implementor, Verifier
 from .client import InferenceClient
+from .config import HarnessConfig
+from .context import ContextManager
+from .executor import ToolExecutor
 from .git_isolation import WorktreeManager
 from .schemas import Task, TaskPlan, TaskStatus, VerificationResult
 
@@ -35,20 +39,48 @@ class OrchestratorResult:
     def all_passed(self) -> bool:
         return all(r.task.status == TaskStatus.COMPLETED for r in self.results)
 
+    def summary(self) -> str:
+        passed = sum(1 for r in self.results if r.task.status == TaskStatus.COMPLETED)
+        failed = sum(1 for r in self.results if r.task.status == TaskStatus.FAILED)
+        return f"{passed} passed, {failed} failed, {len(self.plan.tasks)} total"
+
 
 class Orchestrator:
     """Runs the full Coordinator -> Implementor -> Verifier pipeline."""
 
-    def __init__(self, client: InferenceClient, repo_path: str | Path):
-        self.coordinator = Coordinator(client)
-        self.implementor = Implementor(client)
-        self.verifier = Verifier(client)
-        self.worktrees = WorktreeManager(repo_path)
+    def __init__(
+        self,
+        client: InferenceClient,
+        repo_path: str | Path,
+        config: HarnessConfig | None = None,
+    ):
+        self.config = config or HarnessConfig()
         self.repo_path = Path(repo_path).resolve()
+
+        executor = ToolExecutor(self.config, self.repo_path)
+        self.coordinator = Coordinator(client)
+        self.implementor = Implementor(client, executor=executor)
+        self.verifier = Verifier(client)
+        self.worktrees = WorktreeManager(self.repo_path)
+        self.context_mgr = ContextManager(self.repo_path)
+
+        self._on_task_start: list = []
+        self._on_task_end: list = []
+
+    def on_task_start(self, callback) -> None:
+        """Register a callback invoked when a task begins: ``callback(task)``."""
+        self._on_task_start.append(callback)
+
+    def on_task_end(self, callback) -> None:
+        """Register a callback invoked when a task ends: ``callback(task_result)``."""
+        self._on_task_end.append(callback)
 
     def run(self, prompt: str, context: str = "") -> OrchestratorResult:
         """Execute the full CIV pipeline for *prompt*."""
-        plan = self.coordinator.plan(prompt, context)
+        persistent_ctx = self.context_mgr.load()
+        full_context = f"{persistent_ctx}\n\n{context}".strip()
+
+        plan = self.coordinator.plan(prompt, full_context)
         logger.info("Plan: %d tasks", len(plan.tasks))
 
         ordered = _topological_sort(plan.tasks)
@@ -56,8 +88,20 @@ class Orchestrator:
 
         for task in ordered:
             task.status = TaskStatus.IN_PROGRESS
-            tr = self._execute_task(task)
+            for cb in self._on_task_start:
+                cb(task)
+
+            tr = self._execute_task(task, full_context)
             results.append(tr)
+
+            for cb in self._on_task_end:
+                cb(tr)
+
+            # Persist task summary
+            log_excerpt = json.dumps(tr.execution_log[:3], indent=2) if tr.execution_log else ""
+            self.context_mgr.save_task_summary(
+                task.id, task.description, task.status.value, log_excerpt
+            )
 
             if task.status == TaskStatus.FAILED:
                 logger.warning("Task %s failed — aborting remaining tasks", task.id)
@@ -71,12 +115,12 @@ class Orchestrator:
 
     # -- internal ------------------------------------------------------------
 
-    def _execute_task(self, task: Task) -> TaskResult:
+    def _execute_task(self, task: Task, context: str) -> TaskResult:
         tr = TaskResult(task=task)
 
         with self.worktrees.isolated(task.id) as wt:
             log = self.implementor.execute(
-                task, context=f"Working directory: {wt.path}"
+                task, context=f"Working directory: {wt.path}\n{context}"
             )
             tr.execution_log = log
 
@@ -103,7 +147,7 @@ class Orchestrator:
 
 
 def _topological_sort(tasks: list[Task]) -> list[Task]:
-    """Sort tasks respecting dependency order (Kahn-style)."""
+    """Sort tasks respecting dependency order (DFS)."""
     by_id = {t.id: t for t in tasks}
     visited: set[str] = set()
     result: list[Task] = []

@@ -3,7 +3,40 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.2.0] - 2026-05-10
+
+### Added
+- `harness.toml` configuration system (inference, tools, security, logging).
+- `harness init` command to generate default config.
+- `harness verify` command to health-check inference endpoint.
+- `harness info` command to display config and supported AST languages.
+- `--version` / `-V` CLI flag.
+- `--config` / `-c` CLI flag for custom config path.
+- `ContextManager` for `.sdlc/context/` persistent agent memory (markdown + JSON).
+- `ToolExecutor` secure wrapper with path validation and command blocking.
+- `InferenceClient` retry with exponential backoff and health check.
+- `InferenceClient.from_config()` factory method.
+- Multi-language AST support: JavaScript, TypeScript, Go, Rust (via optional deps).
+- `[languages]` optional dependency group for JS/TS grammars.
+- Live TUI display during `harness run` via `rich.live.Live`.
+- Orchestrator lifecycle callbacks (`on_task_start`, `on_task_end`).
+- Orchestrator automatic context persistence after each task.
+- GitHub Actions CI pipeline (lint + test across Python 3.11-3.13).
+- `py.typed` marker for PEP 561 compliance.
+- Comprehensive README with architecture diagram, CLI reference, Python API examples.
+- Integration test suite with mocked inference client (16 tests).
+- CLI test suite (10 tests).
+- Config test suite (5 tests).
+- Context test suite (7 tests).
+- Executor/security test suite (8 tests).
+
+### Changed
+- Version bumped to 0.2.0.
+- `Orchestrator` now accepts `HarnessConfig` and uses `ToolExecutor` for sandboxed tool calls.
+- `Implementor` now accepts optional `ToolExecutor` for security-enforced execution.
+- `OrchestratorResult` gains `.summary()` method.
+
+## [0.1.0] - 2026-05-10
 
 ### Added
 - Repository bootstrap structure.

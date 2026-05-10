@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import TYPE_CHECKING
 
 from .schemas import (
@@ -15,6 +16,9 @@ from .tools import TOOL_ARGS_MAP, TOOL_REGISTRY
 
 if TYPE_CHECKING:
     from .client import InferenceClient
+    from .executor import ToolExecutor
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # System prompts (< 1 000 tokens each per README spec)
@@ -67,8 +71,9 @@ class Implementor:
 
     MAX_STEPS = 20
 
-    def __init__(self, client: InferenceClient):
+    def __init__(self, client: InferenceClient, executor: ToolExecutor | None = None):
         self.client = client
+        self.executor = executor
 
     def execute(self, task: Task, context: str = "") -> list[dict]:
         messages: list[dict[str, str]] = [
@@ -77,7 +82,7 @@ class Implementor:
         ]
 
         log: list[dict] = []
-        for _ in range(self.MAX_STEPS):
+        for step in range(self.MAX_STEPS):
             action = self.client.generate_structured(messages=messages, schema=AgentAction)
 
             if action.action == "finish":
@@ -88,20 +93,32 @@ class Implementor:
                 break
 
             tc = action.tool_call
-            args_cls = TOOL_ARGS_MAP.get(tc.name)
-            handler = TOOL_REGISTRY.get(tc.name)
-            if not args_cls or not handler:
-                log.append({"error": f"Unknown tool: {tc.name}"})
-                break
 
-            parsed_args = args_cls(**tc.arguments)
-            result = handler(parsed_args)
+            if self.executor is not None:
+                try:
+                    result = self.executor.execute(tc.name, tc.arguments)
+                except Exception as e:
+                    result = self.executor.make_error_result(tc.name, str(e))
+                    log.append({"tool": tc.name, "arguments": tc.arguments, "error": str(e)})
+                    messages.append({"role": "assistant", "content": action.model_dump_json()})
+                    messages.append({"role": "user", "content": f"Error: {e}"})
+                    continue
+            else:
+                args_cls = TOOL_ARGS_MAP.get(tc.name)
+                handler = TOOL_REGISTRY.get(tc.name)
+                if not args_cls or not handler:
+                    log.append({"error": f"Unknown tool: {tc.name}"})
+                    break
+                parsed_args = args_cls(**tc.arguments)
+                result = handler(parsed_args)
+
             entry = {
                 "tool": tc.name,
                 "arguments": tc.arguments,
                 "result": result.model_dump(),
             }
             log.append(entry)
+            logger.debug("Step %d: %s -> %s", step, tc.name, result.model_dump())
 
             messages.append({"role": "assistant", "content": action.model_dump_json()})
             messages.append({"role": "user", "content": f"Result: {result.model_dump_json()}"})

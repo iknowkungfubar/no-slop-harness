@@ -28,6 +28,14 @@ _LANGUAGE_CACHE: dict[str, object] = {}
 
 EXTENSION_TO_LANGUAGE: dict[str, str] = {
     ".py": "python",
+    ".js": "javascript",
+    ".mjs": "javascript",
+    ".cjs": "javascript",
+    ".jsx": "javascript",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".go": "go",
+    ".rs": "rust",
 }
 
 
@@ -36,27 +44,55 @@ def _get_language(lang_name: str):
     if lang_name in _LANGUAGE_CACHE:
         return _LANGUAGE_CACHE[lang_name]
 
-    from tree_sitter import Language  # deferred to avoid hard startup dep
+    from tree_sitter import Language
 
-    if lang_name == "python":
-        import tree_sitter_python
+    loaders = {
+        "python": lambda: __import__("tree_sitter_python").language(),
+        "javascript": lambda: __import__("tree_sitter_javascript").language(),
+        "typescript": lambda: __import__("tree_sitter_typescript").language_typescript(),
+        "go": lambda: __import__("tree_sitter_go").language(),
+        "rust": lambda: __import__("tree_sitter_rust").language(),
+    }
 
-        language = Language(tree_sitter_python.language())
-    else:
+    loader = loaders.get(lang_name)
+    if loader is None:
         raise ValueError(f"Unsupported language: {lang_name}")
 
+    language = Language(loader())
     _LANGUAGE_CACHE[lang_name] = language
     return language
+
+
+def supported_languages() -> list[str]:
+    """Return list of language names with installed tree-sitter grammars."""
+    available: list[str] = []
+    for lang in ("python", "javascript", "typescript", "go", "rust"):
+        try:
+            _get_language(lang)
+            available.append(lang)
+        except (ImportError, ValueError):
+            pass
+    return available
 
 
 # ---------------------------------------------------------------------------
 # Tool implementations
 # ---------------------------------------------------------------------------
 
+MAX_READ_SIZE = 10_485_760  # 10 MB default
+
 
 def read_file(args: ReadFileArgs) -> ReadFileResult:
     try:
-        content = Path(args.path).read_text(encoding="utf-8")
+        path = Path(args.path)
+        size = path.stat().st_size
+        if size > MAX_READ_SIZE:
+            return ReadFileResult(
+                content="",
+                success=False,
+                error=f"File too large ({size} bytes, limit {MAX_READ_SIZE})",
+            )
+        content = path.read_text(encoding="utf-8")
         return ReadFileResult(content=content)
     except Exception as e:
         return ReadFileResult(content="", success=False, error=str(e))
