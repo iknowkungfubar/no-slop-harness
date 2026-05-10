@@ -36,7 +36,12 @@ class ContextManager:
         return re.sub(r"[^a-zA-Z0-9_\-]", "_", name)
 
     def _safe_path(self, filename: str) -> Path:
-        """Build a path inside context_dir and verify it cannot escape."""
+        """Build a path inside context_dir and verify it cannot escape.
+
+        Uses strict parent equality (not ``is_relative_to``) so only flat
+        filenames are accepted.  If subdirectory support is ever needed,
+        switch to ``path.is_relative_to(self.context_dir.resolve())``.
+        """
         path = (self.context_dir / filename).resolve()
         if not path.parent == self.context_dir.resolve():
             raise ValueError(
