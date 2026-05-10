@@ -32,5 +32,16 @@ Log significant architectural decisions, environment setup quirks, and resolved 
 *   **Logging:** Configurable log level and format (text/JSON) via config.
 *   **CLI:** Added `--version`, `--config`, `harness init`, `harness verify`, `harness info`. Live TUI during `harness run` via `rich.live`.
 *   **CI:** GitHub Actions workflow (lint + test across Python 3.11/3.12/3.13).
-*   **Tests:** 66 unit + integration tests, all passing. Lint clean.
+*   **Tests:** 72 unit + integration tests, all passing. Lint clean.
 *   **Typing:** Added `py.typed` marker for PEP 561 compliance.
+
+## [Date: 2026-05-10] - Production Polish
+*   **Action:** Comprehensive codebase review and production hardening.
+*   **Security:** Replaced `getattr` with `isinstance` type narrowing in `ToolExecutor._validate`. Hardened command blocking to catch separated flags (`rm -r -f`). Sanitized `ContextManager` entry names against path traversal.
+*   **Dead Code:** Removed unused `self.implementor` from `Orchestrator.__init__`.
+*   **Git Safety:** `merge_to_base` now attempts fast-forward via `git fetch` before destructive checkout.
+*   **Typing:** Properly typed `TOOL_REGISTRY`, `TOOL_ARGS_MAP`, orchestrator callback lists. Added `ToolHandler` type alias.
+*   **CLI:** `_cmd_init` now respects `--config` flag. Removed unnecessary `hasattr` check.
+*   **Error Handling:** `_call_with_retry` re-raises original exception instead of wrapping in `RuntimeError`.
+*   **Cleanup:** Removed redundant `requirements.txt`, test session artifacts. Added `LICENSE` file. Added `Worktree.__repr__`.
+*   **Tests:** Removed duplicate `git_repo` fixture. All 72 tests passing.

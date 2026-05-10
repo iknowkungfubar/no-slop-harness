@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-from typing import Union
+from typing import Callable, Union
 
 from .schemas import (
     BashExecuteArgs,
@@ -19,6 +19,7 @@ from .schemas import (
 
 ToolResult = Union[ReadFileResult, WriteFileResult, EditFileAstResult, BashExecuteResult]
 ToolArgs = Union[ReadFileArgs, WriteFileArgs, EditFileAstArgs, BashExecuteArgs]
+ToolHandler = Callable[..., ToolResult]
 
 # ---------------------------------------------------------------------------
 # Language registry for tree-sitter AST editing
@@ -178,14 +179,14 @@ def bash_execute(args: BashExecuteArgs) -> BashExecuteResult:
 # Registry
 # ---------------------------------------------------------------------------
 
-TOOL_REGISTRY: dict = {
+TOOL_REGISTRY: dict[str, ToolHandler] = {
     "read_file": read_file,
     "write_file": write_file,
     "edit_file_ast": edit_file_ast,
     "bash_execute": bash_execute,
 }
 
-TOOL_ARGS_MAP: dict = {
+TOOL_ARGS_MAP: dict[str, type[ToolArgs]] = {
     "read_file": ReadFileArgs,
     "write_file": WriteFileArgs,
     "edit_file_ast": EditFileAstArgs,

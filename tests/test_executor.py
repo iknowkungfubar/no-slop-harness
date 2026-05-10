@@ -117,3 +117,41 @@ class TestErrorResult:
         ex = ToolExecutor(HarnessConfig(), repo)
         r = ex.make_error_result("bash_execute", "oops")
         assert r.stderr == "oops"  # type: ignore[union-attr]
+
+
+class TestHardenedCommandBlocking:
+    def test_rm_separated_flags(self, repo: Path):
+        cfg = HarnessConfig()
+        ex = ToolExecutor(cfg, repo)
+        with pytest.raises(SecurityViolation, match="Destructive rm"):
+            ex.execute("bash_execute", {"cmd": "rm -r -f /tmp/data"})
+
+    def test_rm_combined_flags(self, repo: Path):
+        cfg = HarnessConfig()
+        ex = ToolExecutor(cfg, repo)
+        with pytest.raises(SecurityViolation, match="Destructive rm"):
+            ex.execute("bash_execute", {"cmd": "rm -rf ./data"})
+
+    def test_rm_recursive_long(self, repo: Path):
+        cfg = HarnessConfig()
+        ex = ToolExecutor(cfg, repo)
+        with pytest.raises(SecurityViolation, match="Destructive rm"):
+            ex.execute("bash_execute", {"cmd": "rm --recursive /tmp/data"})
+
+    def test_shred_blocked(self, repo: Path):
+        cfg = HarnessConfig()
+        ex = ToolExecutor(cfg, repo)
+        with pytest.raises(SecurityViolation, match="Destructive command"):
+            ex.execute("bash_execute", {"cmd": "shred /dev/sda"})
+
+    def test_wipefs_blocked(self, repo: Path):
+        cfg = HarnessConfig()
+        ex = ToolExecutor(cfg, repo)
+        with pytest.raises(SecurityViolation, match="Destructive command"):
+            ex.execute("bash_execute", {"cmd": "wipefs /dev/sda"})
+
+    def test_safe_rm_allowed(self, repo: Path):
+        cfg = HarnessConfig()
+        ex = ToolExecutor(cfg, repo)
+        result = ex.execute("bash_execute", {"cmd": "rm nonexistent_file 2>/dev/null; true"})
+        assert result is not None

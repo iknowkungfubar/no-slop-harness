@@ -116,9 +116,9 @@ class InferenceClient:
                     wait,
                 )
                 time.sleep(wait)
-        raise RuntimeError(
-            f"All {self.max_retries + 1} attempts failed"
-        ) from last_error
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError(f"All {self.max_retries + 1} attempts failed")
 
     @staticmethod
     def _is_retryable(exc: Exception) -> bool:
