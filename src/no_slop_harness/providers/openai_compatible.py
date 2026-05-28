@@ -14,7 +14,12 @@ import logging
 from dataclasses import dataclass, field  # noqa: F401
 from typing import Any
 
-import httpx
+try:
+    import httpx
+    _HAS_HTTPX = True
+except ImportError:
+    _HAS_HTTPX = False
+    httpx = None  # type: ignore[assignment]
 
 from no_slop_harness.llm_client import LLMProvider, LLMResponse
 
@@ -46,8 +51,13 @@ class OpenAICompatibleProvider(LLMProvider):
     """
 
     def __init__(self, config: OpenAICompatibleConfig | None = None) -> None:
+        if not _HAS_HTTPX:
+            raise ImportError(
+                "httpx is required for OpenAICompatibleProvider. "
+                "Install with: pip install no-slop-harness[inference]"
+            )
         self.config = config or OpenAICompatibleConfig()
-        self._client = httpx.AsyncClient(
+        self._client = httpx.AsyncClient(  # type: ignore[union-attr]
             base_url=self.config.base_url,
             headers={
                 "Authorization": f"Bearer {self.config.api_key}",
@@ -153,7 +163,8 @@ class OpenAICompatibleProvider(LLMProvider):
 
     async def close(self) -> None:
         """Close the HTTP client."""
-        await self._client.aclose()
+        if _HAS_HTTPX and hasattr(self, '_client'):
+            await self._client.aclose()
 
     async def __aenter__(self) -> OpenAICompatibleProvider:
         return self
