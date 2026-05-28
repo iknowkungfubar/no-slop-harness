@@ -190,8 +190,11 @@ def _load_state() -> dict | None:
     json_files = list(state_dir.glob("pipeline-*.json"))
     if not json_files:
         return None
-    # Load the most recent
-    latest = max(json_files, key=lambda p: p.stat().st_mtime)
+    # Load the most recent by modification time
+    try:
+        latest = sorted(json_files, key=lambda p: p.stat().st_mtime)[-1]
+    except (IndexError, OSError):
+        latest = json_files[0]
     return json.loads(latest.read_text())
 
 
