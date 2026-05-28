@@ -89,30 +89,60 @@ while task := pipeline.next_task():
     # ... LLM implements task ...
     pipeline.report_result(task.task_id, result_output, success=True)
     pipeline.verify_task(task.task_id)
-    pipeline.verification_complete(task.task_id, passed=True)
+    ```bash
+    # Using the full pipeline (requires an LLM endpoint)
+    python -c "
+    import asyncio
+    from no_slop_harness.runner import CIVPipeline
 
-print(pipeline.status())
-```
+    async def main():
+        pipeline = CIVPipeline(
+            base_url='http://localhost:1234/v1',
+            model='qwen/qwen3.6-35b-a3b',
+        )
+        result = await pipeline.run('Add a hello() function to demo.py')
+        print(result['success'], result['summary'])
+
+    asyncio.run(main())
+    "
+    ```
 
 ## Architecture
 
 ```
 src/no_slop_harness/
 ├── __init__.py              # Package version
-├── cli.py                   # Click-based CLI entrypoint
-├── schemas.py               # Pydantic models (Task, CIVMessage, ToolCall, etc.)
+├── cli.py                   # Click-based CLI (init, status, list, verify, report)
+├── runner.py                # End-to-end CIV pipeline runner
+├── schemas.py               # Pydantic models (Task, CIVMessage, ToolCall, SandboxConfig, PipelineState)
 ├── orchestrator.py          # CIV PipelineOrchestrator lifecycle
-├── dag.py                   # Topological sort + DAG validation
+├── async_orchestrator.py    # Async pipeline for parallel task execution
+├── dag.py                   # Topological sort (Kahn's) + DAG validation
 ├── pipeline_scheduler.py    # TaskScheduler + ResultCollector
-├── sandbox.py               # Sandboxed command execution
+├── sandbox.py               # Sandboxed command execution (allowlist, blocklist, timeout)
 ├── ast_editor.py            # Tree-sitter AST editor with regex fallback
 ├── verifier.py              # Test/lint/typecheck runner
-├── errors.py                # Exception hierarchy
-├── logging_config.py        # Structured logging setup
-├── async_orchestrator.py    # Async pipeline for parallel task execution
+├── worktree.py              # Git worktree isolation per task
+├── sdlc.py                  # .sdlc/ context injection (ADRs, standards, memory)
+├── constrained.py           # llguidance grammar-enforced JSON output
+├── rag.py                   # RAG + self-healing hallucination detection
+├── advanced_metrics.py      # Token entropy, variance penalty, inter-step timing
+├── tla_bridge.py            # TLA+ formal verification bridge (spec gen + TLC)
+├── llm_client.py            # LLM provider abstraction with retry logic
+├── logging_config.py        # Structured logging (JSON formatter, PipelineLogger)
 ├── metrics.py               # Observability (counters, timers, histograms)
-├── llm_client.py            # LLM provider abstraction
-└── plugin.py                # Plugin system for extensibility
+├── plugin.py                # Plugin system (discovery, registration, lifecycle hooks)
+├── errors.py                # Exception hierarchy
+├── agents/                  # CIV agent implementations
+│   ├── coordinator.py       # Task decomposition agent
+│   ├── implementor.py       # Task execution agent with constrained toolset
+│   └── verifier.py          # Automated verification agent
+├── providers/               # LLM provider backends
+│   └── openai_compatible.py # OpenAI-compatible API (LM Studio, OpenRouter, vLLM, Ollama)
+└── prompts/                 # Agent system prompt templates
+    ├── coordinator.txt
+    ├── implementor.txt
+    └── verifier.txt
 ```
 
 ## Development

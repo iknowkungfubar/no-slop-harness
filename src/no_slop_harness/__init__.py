@@ -4,4 +4,4 @@ Implements the Coordinator-Implementor-Verifier (CIV) pattern for
 zero-slop, high-fidelity software engineering.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.9.0"
