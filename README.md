@@ -40,19 +40,49 @@ No-Slop Harness is an agentic framework that enforces structured, verifiable LLM
 
 ### Installation
 
+**Recommended: pipx** (isolated, works on all distros including Arch, Debian 12+, Ubuntu 24.04+, Fedora)
+
 ```bash
-# Basic — schemas, orchestration, CLI (no LLM calls, no native deps)
-pip install no-slop-harness
+# Install pipx if you don't have it
+sudo pacman -S pipx        # Arch
+sudo apt install pipx       # Debian/Ubuntu
+sudo dnf install pipx       # Fedora
 
-# With LLM inference — adds httpx for OpenAI-compatible API calls
-pip install no-slop-harness[inference]
+# Install no-slop-harness
+pipx install no-slop-harness[inference]
 
-# With constrained decoding — adds llguidance for grammar-enforced JSON output
-pip install no-slop-harness[constrained]
-
-# Everything — development + inference + constrained decoding
-pip install no-slop-harness[dev,inference,constrained]
+# Or with constrained decoding
+pipx install no-slop-harness[inference,constrained]
 ```
+
+**uv** (fast, modern, venv-based)
+
+```bash
+uv tool install no-slop-harness[inference]
+```
+
+**venv** (traditional, works everywhere)
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install no-slop-harness[inference]
+```
+
+**pip --break-system-packages** (quick, not recommended)
+
+```bash
+pip install --break-system-packages no-slop-harness
+```
+
+**Extras reference:**
+
+| Extra | Adds | Size |
+|-------|------|------|
+| *(none)* | Core: schemas, orchestration, CLI, verifier, plugin system | ~5MB |
+| `[inference]` | `httpx` — OpenAI-compatible LLM API client | +3MB |
+| `[constrained]` | `llguidance` — grammar-enforced JSON output | +2.4MB |
+| `[dev]` | pytest, ruff, mypy — development tools | +15MB |
 
 ### Basic Usage
 
