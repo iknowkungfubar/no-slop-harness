@@ -199,8 +199,8 @@ class SandboxConfig(BaseModel):
         le=300,
     )
     working_directory: str = Field(
-        default="/tmp",  # noqa: S108 — sandbox default, overridable
-        description="CWD for executed commands.",
+        default_factory=lambda: __import__("tempfile").gettempdir(),
+        description="CWD for executed commands (defaults to system temp directory).",
     )
     max_output_bytes: int = Field(
         default=1_048_576,  # 1 MiB
