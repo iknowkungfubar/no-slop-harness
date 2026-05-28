@@ -19,7 +19,7 @@ python -m venv .venv
 source .venv/bin/activate
 
 # Install in editable mode with dev dependencies
-pip install -e ".[dev]"
+pip install -e ".[dev,inference,constrained]"
 ```
 
 ### Verify Installation

@@ -41,15 +41,17 @@ No-Slop Harness is an agentic framework that enforces structured, verifiable LLM
 ### Installation
 
 ```bash
+# Basic — schemas, orchestration, CLI (no LLM calls, no native deps)
 pip install no-slop-harness
-```
 
-Or from source:
+# With LLM inference — adds httpx for OpenAI-compatible API calls
+pip install no-slop-harness[inference]
 
-```bash
-git clone https://github.com/your-org/no-slop-harness.git
-cd no-slop-harness
-pip install -e ".[dev]"
+# With constrained decoding — adds llguidance for grammar-enforced JSON output
+pip install no-slop-harness[constrained]
+
+# Everything — development + inference + constrained decoding
+pip install no-slop-harness[dev,inference,constrained]
 ```
 
 ### Basic Usage
