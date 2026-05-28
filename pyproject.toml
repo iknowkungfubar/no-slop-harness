@@ -1,0 +1,73 @@
+# Python build system
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "no-slop-harness"
+version = "0.1.0"
+description = "Deterministic, local-first LLM orchestration framework implementing the CIV pattern."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0,<3.0",
+    "rich>=13.0,<14.0",
+    "click>=8.0,<9.0",
+    "tree-sitter>=0.21.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
+inference = [
+    "llguidance>=0.4.0",
+    "vllm>=0.4.0",
+]
+
+[project.scripts]
+no-slop = "no_slop_harness.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/no_slop_harness"]
+
+# Code quality
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "S"]
+ignore = ["S101"]  # noqa: allow assert in tests
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["src/no_slop_harness"]
+omit = ["src/no_slop_harness/__pycache__/*"]
+
+[tool.coverage.report]
+fail_under = 75
+exclude_also = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
