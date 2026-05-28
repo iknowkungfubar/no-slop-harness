@@ -23,10 +23,13 @@ logger = logging.getLogger(__name__)
 
 try:
     import llguidance  # noqa: F401
+
     _HAS_LLGUIDANCE = True
 except ImportError:
     _HAS_LLGUIDANCE = False
-    logger.info("llguidance not installed — constrained decoding disabled. Install with: pip install llguidance")  # noqa: E501
+    logger.info(
+        "llguidance not installed — constrained decoding disabled. Install with: pip install llguidance"  # noqa: E501
+    )  # noqa: E501
 
 
 class ConstrainedDecoder:
@@ -263,7 +266,7 @@ def _build_llguidance_grammar(json_schema: dict) -> str:
         for i, (prop_name, prop_schema) in enumerate(properties.items()):  # noqa: B007
             prop_rule = _schema_to_rule(prop_schema)
             rules.append(f'"{prop_name}": {prop_rule}')
-        separator = ',\n  '
+        separator = ",\n  "
         return 'root ::= "{\\n  " (' + f" {separator} ".join(rules) + ') "\\n}"'
 
     return "root ::= string"

@@ -190,13 +190,15 @@ class HallucinationDetector:
                 attr_pattern = re.compile(r"^\s{4}(\w+)\s*:", re.MULTILINE)
                 actual = len(attr_pattern.findall(context))
                 if actual != num and actual > 0:
-                    contradictions.append({
-                        "pattern": "numeric_contradiction",
-                        "claim": claim.strip(),
-                        "claimed_count": num,
-                        "actual_count": actual,
-                        "location": f"Output claims {num}, context has {actual}",
-                    })
+                    contradictions.append(
+                        {
+                            "pattern": "numeric_contradiction",
+                            "claim": claim.strip(),
+                            "claimed_count": num,
+                            "actual_count": actual,
+                            "location": f"Output claims {num}, context has {actual}",
+                        }
+                    )
 
         return contradictions
 
@@ -250,7 +252,9 @@ class HallucinationDetector:
         overlap = prompt_terms & output_terms
         return len(overlap) / len(prompt_terms)
 
-    def faithfulness_score(self, output: str, retrieved_docs: list[tuple[Document, float]]) -> float:  # noqa: E501
+    def faithfulness_score(
+        self, output: str, retrieved_docs: list[tuple[Document, float]]
+    ) -> float:  # noqa: E501
         """Score how faithful the output is to retrieved context (0-100).
 
         A score <40% means the output contains ungrounded assertions
@@ -372,11 +376,15 @@ class SelfHealingRAG:
         # 3. Answer drift
         drift = self.detector.detect_answer_drift(output, prompt)
         if drift < 0.3:
-            issues.append(f"Answer drift: output similarity to prompt = {drift:.2f} (threshold: 0.3)")  # noqa: E501
+            issues.append(
+                f"Answer drift: output similarity to prompt = {drift:.2f} (threshold: 0.3)"
+            )  # noqa: E501
 
         # 4. Ungrounded assertions
         if self.detector.is_ungrounded(output, docs):
-            issues.append(f"Ungrounded assertions: faithfulness = {faithfulness_before:.1f}% (threshold: 40%)")  # noqa: E501
+            issues.append(
+                f"Ungrounded assertions: faithfulness = {faithfulness_before:.1f}% (threshold: 40%)"
+            )  # noqa: E501
 
         # Build correction prompt
         healed_output = output

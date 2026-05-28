@@ -106,8 +106,14 @@ class WorktreeIsolation:
                 _git(self.repo_path, "checkout", "main")
             except subprocess.CalledProcessError:
                 _git(self.repo_path, "checkout", "master")
-            _git(self.repo_path, "merge", ctx.branch_name, "--no-ff", "-m",
-                 f"feat: implement {ctx.task_id} [no-slop]")
+            _git(
+                self.repo_path,
+                "merge",
+                ctx.branch_name,
+                "--no-ff",
+                "-m",
+                f"feat: implement {ctx.task_id} [no-slop]",
+            )
 
             # Delete the feature branch
             _git(self.repo_path, "branch", "-d", ctx.branch_name)

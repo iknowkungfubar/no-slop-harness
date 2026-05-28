@@ -533,13 +533,13 @@ def _task_set_block(name: str, count: int) -> list[str]:
         f"{name} == 1 .. {count}",
         "",
         "\\* Task states that the pipeline recognises",
-        "Pending   == \"pending\"",
-        "Assigned  == \"assigned\"",
-        "Running   == \"in_progress\"",
-        "Verifying == \"verifying\"",
-        "Completed == \"completed\"",
-        "Failed    == \"failed\"",
-        "RolledBack == \"rolled_back\"",
+        'Pending   == "pending"',
+        'Assigned  == "assigned"',
+        'Running   == "in_progress"',
+        'Verifying == "verifying"',
+        'Completed == "completed"',
+        'Failed    == "failed"',
+        'RolledBack == "rolled_back"',
         "",
         "TaskStates == {Pending, Assigned, Running, Verifying, Completed, Failed, RolledBack}",
     ]
@@ -611,7 +611,9 @@ def _next_block(state_machine: list[dict[str, Any]] | None) -> list[str]:
     lines.append("Assign(t) ==")
     lines.append("    /\\ task_state[t] = Pending")
     lines.append("    /\\ task_state' = [task_state EXCEPT ![t] = Assigned]")
-    lines.append("    /\\ UNCHANGED <<task_deps, executions, blocked, completed_tasks, failed_tasks>>")  # noqa: E501
+    lines.append(
+        "    /\\ UNCHANGED <<task_deps, executions, blocked, completed_tasks, failed_tasks>>"
+    )  # noqa: E501
     lines.append("")
 
     # Start (only when dependencies are satisfied)
@@ -619,7 +621,9 @@ def _next_block(state_machine: list[dict[str, Any]] | None) -> list[str]:
     lines.append("Start(t) ==")
     lines.append("    /\\ task_state[t] = Assigned")
     lines.append("    /\\ task_deps[t] \\subseteq completed_tasks   \\* DependencyRespect")
-    lines.append("    /\\ executions[t] = 0                            \\* NoDuplicateExecution guard")  # noqa: E501
+    lines.append(
+        "    /\\ executions[t] = 0                            \\* NoDuplicateExecution guard"
+    )  # noqa: E501
     lines.append("    /\\ task_state' = [task_state EXCEPT ![t] = Running]")
     lines.append("    /\\ executions' = [executions EXCEPT ![t] = executions[t] + 1]")
     lines.append("    /\\ UNCHANGED <<task_deps, blocked, completed_tasks, failed_tasks>>")
@@ -629,7 +633,9 @@ def _next_block(state_machine: list[dict[str, Any]] | None) -> list[str]:
     lines.append("Verify(t) ==")
     lines.append("    /\\ task_state[t] = Running")
     lines.append("    /\\ task_state' = [task_state EXCEPT ![t] = Verifying]")
-    lines.append("    /\\ UNCHANGED <<task_deps, executions, blocked, completed_tasks, failed_tasks>>")  # noqa: E501
+    lines.append(
+        "    /\\ UNCHANGED <<task_deps, executions, blocked, completed_tasks, failed_tasks>>"
+    )  # noqa: E501
     lines.append("")
 
     # Complete
@@ -662,7 +668,9 @@ def _next_block(state_machine: list[dict[str, Any]] | None) -> list[str]:
     lines.append("    /\\ task_state[t] = Failed")
     lines.append("    /\\ executions[t] >= MaxRetries")
     lines.append("    /\\ task_state' = [task_state EXCEPT ![t] = RolledBack]")
-    lines.append("    /\\ UNCHANGED <<task_deps, executions, blocked, completed_tasks, failed_tasks>>")  # noqa: E501
+    lines.append(
+        "    /\\ UNCHANGED <<task_deps, executions, blocked, completed_tasks, failed_tasks>>"
+    )  # noqa: E501
     lines.append("")
 
     # Deadlock detection
@@ -675,7 +683,9 @@ def _next_block(state_machine: list[dict[str, Any]] | None) -> list[str]:
     lines.append("SetBlocked ==")
     lines.append("    /\\ \\E t \\in Tasks : Deadlocked(t)")
     lines.append("    /\\ blocked' = TRUE")
-    lines.append("    /\\ UNCHANGED <<task_state, task_deps, executions, completed_tasks, failed_tasks>>")  # noqa: E501
+    lines.append(
+        "    /\\ UNCHANGED <<task_state, task_deps, executions, completed_tasks, failed_tasks>>"
+    )  # noqa: E501
     lines.append("")
 
     # Next
@@ -850,7 +860,7 @@ def _extract_module_name(spec_text: str) -> str | None:
     for line in spec_text.splitlines():
         stripped = line.strip()
         if stripped.startswith("---- MODULE ") and stripped.endswith(" ----"):
-            return stripped[len("---- MODULE "):-len(" ----")].strip()
+            return stripped[len("---- MODULE ") : -len(" ----")].strip()
     return None
 
 
@@ -863,8 +873,7 @@ def _parse_tlc_output(raw: str) -> tuple[bool, str | None]:
     - ``Error: Invariant ... is violated.`` → failed + counterexample
     """
     passed = "No error has been found" in raw or (
-        "Model checking completed" in raw
-        and "Error" not in raw
+        "Model checking completed" in raw and "Error" not in raw
     )
 
     counterexample: str | None = None

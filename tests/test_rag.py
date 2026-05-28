@@ -95,7 +95,9 @@ class TestHallucinationDetector:
         grounded = "The User model with email and password fields"
         ungrounded = "The Zorg model has blorp and flarp fields"
 
-        assert detector.faithfulness_score(grounded, docs) > detector.faithfulness_score(ungrounded, docs)  # noqa: E501
+        assert detector.faithfulness_score(grounded, docs) > detector.faithfulness_score(
+            ungrounded, docs
+        )  # noqa: E501
 
     def test_is_ungrounded_threshold(self) -> None:
         detector = HallucinationDetector()
@@ -142,9 +144,7 @@ class TestSelfHealingRAG:
         rag = SelfHealingRAG(store)
 
         output = "The User model has 5 fields"
-        contradictions = [
-            {"claim": "has 5 fields", "claimed_count": 5, "actual_count": 1}
-        ]
+        contradictions = [{"claim": "has 5 fields", "claimed_count": 5, "actual_count": 1}]
         scrubbed = rag.scrub_entities(output, contradictions)
         assert "CORRECTED" in scrubbed
         assert "1" in scrubbed

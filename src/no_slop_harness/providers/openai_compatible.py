@@ -16,6 +16,7 @@ from typing import Any
 
 try:
     import httpx
+
     _HAS_HTTPX = True
 except ImportError:
     _HAS_HTTPX = False
@@ -163,7 +164,7 @@ class OpenAICompatibleProvider(LLMProvider):
 
     async def close(self) -> None:
         """Close the HTTP client."""
-        if _HAS_HTTPX and hasattr(self, '_client'):
+        if _HAS_HTTPX and hasattr(self, "_client"):
             await self._client.aclose()
 
     async def __aenter__(self) -> OpenAICompatibleProvider:

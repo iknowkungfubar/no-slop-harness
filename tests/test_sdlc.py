@@ -15,39 +15,47 @@ class TestSDLCContext:
 
     def test_adr_injection(self) -> None:
         ctx = SDLCContext()
-        ctx.adrs.append({
-            "title": "Use CIV Pattern",
-            "content": "We decided to use the CIV pattern for all agent workflows.",
-        })
+        ctx.adrs.append(
+            {
+                "title": "Use CIV Pattern",
+                "content": "We decided to use the CIV pattern for all agent workflows.",
+            }
+        )
         text = ctx.to_prompt_text()
         assert "Use CIV Pattern" in text
         assert "CIV pattern" in text
 
     def test_standards_injection(self) -> None:
         ctx = SDLCContext()
-        ctx.standards.append({
-            "title": "Python Style",
-            "content": "- Use type annotations\n- Max line length 100",
-        })
+        ctx.standards.append(
+            {
+                "title": "Python Style",
+                "content": "- Use type annotations\n- Max line length 100",
+            }
+        )
         text = ctx.to_prompt_text()
         assert "Python Style" in text
         assert "type annotations" in text
 
     def test_max_chars_truncation(self) -> None:
         ctx = SDLCContext()
-        ctx.adrs.append({
-            "title": "ADR 1",
-            "content": "x" * 5000,
-        })
+        ctx.adrs.append(
+            {
+                "title": "ADR 1",
+                "content": "x" * 5000,
+            }
+        )
         text = ctx.to_prompt_text(max_chars=100)
         assert len(text) <= 100 + len("...(truncated)\n\n")
 
     def test_patterns_injection(self) -> None:
         ctx = SDLCContext()
-        ctx.patterns.append({
-            "title": "Model Template",
-            "content": "class BaseModel:\n    pass",
-        })
+        ctx.patterns.append(
+            {
+                "title": "Model Template",
+                "content": "class BaseModel:\n    pass",
+            }
+        )
         text = ctx.to_prompt_text()
         assert "Model Template" in text
         assert "BaseModel" in text

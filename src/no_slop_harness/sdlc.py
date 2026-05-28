@@ -74,14 +74,16 @@ class SDLCContext:
         if self.patterns:
             pat_text = "## Code Patterns\n\n"
             for pat in self.patterns[:3]:  # Max 3 patterns
-                pat_text += f"### {pat.get('title', 'Pattern')}\n```\n{pat.get('content', '')}\n```\n\n"  # noqa: E501
+                pat_text += (
+                    f"### {pat.get('title', 'Pattern')}\n```\n{pat.get('content', '')}\n```\n\n"  # noqa: E501
+                )
             sections.append(pat_text)
 
         combined = "\n\n".join(sections)
         if len(combined) > max_chars:
             # Truncate the oldest ADRs first
             combined = combined[-max_chars:]
-            combined = "...(truncated)\n\n" + combined[combined.find("\n##", 10):]
+            combined = "...(truncated)\n\n" + combined[combined.find("\n##", 10) :]
 
         return combined.strip()
 
@@ -122,12 +124,16 @@ class SDLCLoader:
             for adr_file in sorted(adr_dir.glob("*.md")):
                 try:
                     content = adr_file.read_text()
-                    title = content.split("\n")[0].lstrip("# ").strip() if content else adr_file.stem  # noqa: E501
-                    context.adrs.append({
-                        "title": title,
-                        "content": content,
-                        "file": str(adr_file.name),
-                    })
+                    title = (
+                        content.split("\n")[0].lstrip("# ").strip() if content else adr_file.stem
+                    )  # noqa: E501
+                    context.adrs.append(
+                        {
+                            "title": title,
+                            "content": content,
+                            "file": str(adr_file.name),
+                        }
+                    )
                 except Exception as e:
                     logger.warning("Failed to load ADR %s: %s", adr_file, e)
 
@@ -137,12 +143,16 @@ class SDLCLoader:
             for std_file in sorted(std_dir.glob("*.md")):
                 try:
                     content = std_file.read_text()
-                    title = content.split("\n")[0].lstrip("# ").strip() if content else std_file.stem  # noqa: E501
-                    context.standards.append({
-                        "title": title,
-                        "content": content,
-                        "file": str(std_file.name),
-                    })
+                    title = (
+                        content.split("\n")[0].lstrip("# ").strip() if content else std_file.stem
+                    )  # noqa: E501
+                    context.standards.append(
+                        {
+                            "title": title,
+                            "content": content,
+                            "file": str(std_file.name),
+                        }
+                    )
                 except Exception as e:
                     logger.warning("Failed to load standard %s: %s", std_file, e)
 
@@ -153,11 +163,13 @@ class SDLCLoader:
                 if pat_file.suffix in (".py", ".ts", ".go", ".rs", ".js", ".md"):
                     try:
                         content = pat_file.read_text()
-                        context.patterns.append({
-                            "title": pat_file.stem.replace("-", " ").replace("_", " ").title(),
-                            "content": content,
-                            "file": str(pat_file.name),
-                        })
+                        context.patterns.append(
+                            {
+                                "title": pat_file.stem.replace("-", " ").replace("_", " ").title(),
+                                "content": content,
+                                "file": str(pat_file.name),
+                            }
+                        )
                     except Exception as e:
                         logger.warning("Failed to load pattern %s: %s", pat_file, e)
 
@@ -244,7 +256,7 @@ class SDLCLoader:
                 "- Use type annotations on all public functions\n"
                 "- Line length: 100 characters\n"
                 "- Use `from __future__ import annotations` in every file\n"
-                "- Pydantic models: set `model_config = {\"extra\": \"forbid\"}`\n"
+                '- Pydantic models: set `model_config = {"extra": "forbid"}`\n'
                 "- Tests: one test file per source module, class-based organization\n"
             )
 

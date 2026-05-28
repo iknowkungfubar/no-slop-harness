@@ -17,11 +17,19 @@ def git_repo(tmp_path):
     repo = tmp_path / "repo"
     repo.mkdir()
     subprocess.run(["git", "-C", str(repo), "init"], check=True, capture_output=True)  # noqa: S603, S607
-    subprocess.run(["git", "-C", str(repo), "config", "user.email", "test@test.com"], check=True, capture_output=True)  # noqa: E501, S603, S607
-    subprocess.run(["git", "-C", str(repo), "config", "user.name", "Test"], check=True, capture_output=True)  # noqa: E501, S603, S607
+    subprocess.run(  # noqa: S603
+        ["git", "-C", str(repo), "config", "user.email", "test@test.com"],  # noqa: S607
+        check=True,
+        capture_output=True,
+    )  # noqa: E501, S603, S607
+    subprocess.run(  # noqa: S603
+        ["git", "-C", str(repo), "config", "user.name", "Test"], check=True, capture_output=True  # noqa: S607
+    )  # noqa: E501, S603, S607
     (repo / "README.md").write_text("# Test Repo\n")
     subprocess.run(["git", "-C", str(repo), "add", "."], check=True, capture_output=True)  # noqa: S603, S607
-    subprocess.run(["git", "-C", str(repo), "commit", "-m", "initial"], check=True, capture_output=True)  # noqa: E501, S603, S607
+    subprocess.run(  # noqa: S603
+        ["git", "-C", str(repo), "commit", "-m", "initial"], check=True, capture_output=True  # noqa: S607
+    )  # noqa: E501, S603, S607
     return repo
 
 
@@ -61,8 +69,14 @@ class TestWorktreeIsolation:
 
         # Make a change in the worktree
         (ctx.worktree_path / "new_file.txt").write_text("hello")
-        subprocess.run(["git", "-C", str(ctx.worktree_path), "add", "."], check=True, capture_output=True)  # noqa: E501, S603, S607
-        subprocess.run(["git", "-C", str(ctx.worktree_path), "commit", "-m", "feat: add file"], check=True, capture_output=True)  # noqa: E501, S603, S607
+        subprocess.run(  # noqa: S603
+            ["git", "-C", str(ctx.worktree_path), "add", "."], check=True, capture_output=True  # noqa: S607
+        )  # noqa: E501, S603, S607
+        subprocess.run(  # noqa: S603
+            ["git", "-C", str(ctx.worktree_path), "commit", "-m", "feat: add file"],  # noqa: S607
+            check=True,
+            capture_output=True,
+        )  # noqa: E501, S603, S607
 
         # Merge back
         result = asyncio.run(iso.merge(ctx))
@@ -77,8 +91,14 @@ class TestWorktreeIsolation:
         ctx = asyncio.run(iso.isolate("abort_test"))
 
         (ctx.worktree_path / "junk.txt").write_text("should be discarded")
-        subprocess.run(["git", "-C", str(ctx.worktree_path), "add", "."], check=True, capture_output=True)  # noqa: E501, S603, S607
-        subprocess.run(["git", "-C", str(ctx.worktree_path), "commit", "-m", "junk"], check=True, capture_output=True)  # noqa: E501, S603, S607
+        subprocess.run(  # noqa: S603
+            ["git", "-C", str(ctx.worktree_path), "add", "."], check=True, capture_output=True  # noqa: S607
+        )  # noqa: E501, S603, S607
+        subprocess.run(  # noqa: S603
+            ["git", "-C", str(ctx.worktree_path), "commit", "-m", "junk"],  # noqa: S607
+            check=True,
+            capture_output=True,
+        )  # noqa: E501, S603, S607
 
         asyncio.run(iso.abort(ctx))
         assert not ctx.worktree_path.exists()

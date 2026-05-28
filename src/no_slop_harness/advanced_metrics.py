@@ -200,9 +200,7 @@ class InterStepTimer:
         total = sum(s["total_ms"] for s in stats.values())
         if total > 0:
             for phase in stats:
-                stats[phase]["pct_of_total"] = round(
-                    stats[phase]["total_ms"] / total * 100, 1
-                )
+                stats[phase]["pct_of_total"] = round(stats[phase]["total_ms"] / total * 100, 1)
 
         return stats
 
@@ -265,7 +263,9 @@ class AdvancedMetricsRegistry:
         if bottleneck:
             stats = self.timing.phase_stats().get(bottleneck, {})
             if stats.get("pct_of_total", 0) > 60:
-                issues.append(f"Bottleneck at '{bottleneck}' phase ({stats['pct_of_total']}% of time)")  # noqa: E501
+                issues.append(
+                    f"Bottleneck at '{bottleneck}' phase ({stats['pct_of_total']}% of time)"
+                )  # noqa: E501
 
         return {
             "status": "healthy" if not issues else "degraded",
