@@ -18,8 +18,13 @@ class TestJSONFormatter:
     def test_format_produces_valid_json(self) -> None:
         fmt = JSONFormatter()
         record = logging.LogRecord(
-            name="test", level=logging.INFO, pathname="", lineno=1,
-            msg="hello world", args=(), exc_info=None,
+            name="test",
+            level=logging.INFO,
+            pathname="",
+            lineno=1,
+            msg="hello world",
+            args=(),
+            exc_info=None,
         )
         output = fmt.format(record)
         parsed = json.loads(output)
@@ -30,8 +35,13 @@ class TestJSONFormatter:
     def test_format_includes_timestamp(self) -> None:
         fmt = JSONFormatter()
         record = logging.LogRecord(
-            name="t", level=logging.WARNING, pathname="", lineno=1,
-            msg="test", args=(), exc_info=None,
+            name="t",
+            level=logging.WARNING,
+            pathname="",
+            lineno=1,
+            msg="test",
+            args=(),
+            exc_info=None,
         )
         output = fmt.format(record)
         parsed = json.loads(output)
@@ -41,8 +51,13 @@ class TestJSONFormatter:
     def test_format_skips_standard_record_attrs(self) -> None:
         fmt = JSONFormatter()
         record = logging.LogRecord(
-            name="t", level=logging.INFO, pathname="", lineno=1,
-            msg="msg", args=(), exc_info=None,
+            name="t",
+            level=logging.INFO,
+            pathname="",
+            lineno=1,
+            msg="msg",
+            args=(),
+            exc_info=None,
         )
         output = fmt.format(record)
         parsed = json.loads(output)

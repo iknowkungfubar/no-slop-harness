@@ -119,9 +119,13 @@ class TestLLMClient:
         assert mock.last_prompt == "prompt"
 
     def test_generate_retries_on_failure(self) -> None:
-        client = LLMClient(config=LLMClientConfig(
-            provider="mock", max_retries=3, retry_delay_seconds=0.01,
-        ))
+        client = LLMClient(
+            config=LLMClientConfig(
+                provider="mock",
+                max_retries=3,
+                retry_delay_seconds=0.01,
+            )
+        )
         # Fail twice, succeed on third
         mock = MockProvider(fail_count=2, responses=[LLMResponse(content="success")])
         client.register_provider("mock", mock)
@@ -131,9 +135,13 @@ class TestLLMClient:
         assert mock.call_count == 3  # 2 failures + 1 success
 
     def test_generate_exhausts_retries(self) -> None:
-        client = LLMClient(config=LLMClientConfig(
-            provider="mock", max_retries=2, retry_delay_seconds=0.01,
-        ))
+        client = LLMClient(
+            config=LLMClientConfig(
+                provider="mock",
+                max_retries=2,
+                retry_delay_seconds=0.01,
+            )
+        )
         mock = MockProvider(fail_count=99)  # Always fails
         client.register_provider("mock", mock)
 

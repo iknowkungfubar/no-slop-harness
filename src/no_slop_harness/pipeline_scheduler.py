@@ -53,12 +53,14 @@ class ResultCollector:
         self.records: list[dict] = []
 
     def add(self, task_id: str, status: str, output: str = "", duration_ms: float = 0.0) -> None:
-        self.records.append({
-            "task_id": task_id,
-            "status": status,
-            "output": output,
-            "duration_ms": duration_ms,
-        })
+        self.records.append(
+            {
+                "task_id": task_id,
+                "status": status,
+                "output": output,
+                "duration_ms": duration_ms,
+            }
+        )
 
     @property
     def success(self) -> bool:

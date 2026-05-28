@@ -141,9 +141,7 @@ class PluginRegistry:
             if py_file.name.startswith("_"):
                 continue
             try:
-                spec = importlib.util.spec_from_file_location(
-                    py_file.stem, str(py_file)
-                )
+                spec = importlib.util.spec_from_file_location(py_file.stem, str(py_file))
                 if spec is None or spec.loader is None:
                     logger.warning("Could not load spec for plugin file: %s", py_file)
                     continue

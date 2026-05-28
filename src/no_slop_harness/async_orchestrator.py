@@ -156,9 +156,7 @@ class AsyncPipelineOrchestrator:
                         completed=list(completed),
                     )
                     self.state.failed = True
-                    self.state.failure_reason = (
-                        f"Failed tasks blocking pipeline: {failed_tasks}"
-                    )
+                    self.state.failure_reason = f"Failed tasks blocking pipeline: {failed_tasks}"
                     return False
                 # Shouldn't happen if DAG is valid, but guard against infinite loop
                 break
@@ -270,9 +268,7 @@ class AsyncPipelineOrchestrator:
         self._task_counter.inc()
         return False
 
-    def _get_ready_tasks(
-        self, completed: set[str], failed: set[str]
-    ) -> list[str]:
+    def _get_ready_tasks(self, completed: set[str], failed: set[str]) -> list[str]:
         """Get task IDs that are ready to execute (all deps satisfied)."""
         ready: list[str] = []
         for tid in self.state.task_order:
@@ -282,9 +278,7 @@ class AsyncPipelineOrchestrator:
             if task.status in (TaskStatus.IN_PROGRESS, TaskStatus.VERIFYING):
                 continue
 
-            deps_satisfied = all(
-                dep in completed for dep in task.dependencies
-            )
+            deps_satisfied = all(dep in completed for dep in task.dependencies)
             if deps_satisfied:
                 # Check if any dependency failed
                 dep_failed = any(dep in failed for dep in task.dependencies)
@@ -300,9 +294,13 @@ class AsyncPipelineOrchestrator:
         return {
             "request_id": self.request_id,
             "total_tasks": len(self.state.tasks),
-            "completed": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.COMPLETED),  # noqa: E501
+            "completed": sum(
+                1 for t in self.state.tasks.values() if t.status == TaskStatus.COMPLETED
+            ),  # noqa: E501
             "failed": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.FAILED),
-            "in_progress": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.IN_PROGRESS),  # noqa: E501
+            "in_progress": sum(
+                1 for t in self.state.tasks.values() if t.status == TaskStatus.IN_PROGRESS
+            ),  # noqa: E501
             "pending": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.PENDING),
             "all_done": self.state.completed or self.state.failed,
             "metrics": self.config.metrics.report(),

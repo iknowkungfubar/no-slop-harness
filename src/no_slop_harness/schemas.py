@@ -63,7 +63,7 @@ class ToolCall(BaseModel):
     params: dict[str, Any] = Field(..., description="Validated parameters.")
     rationale: str = Field(
         "",
-        description = "Brief explanation of why this tool was chosen.",
+        description="Brief explanation of why this tool was chosen.",
         max_length=500,
     )
 
@@ -140,9 +140,7 @@ class Task(BaseModel):
     @classmethod
     def validate_task_id(cls, v: str) -> str:
         if not v.isidentifier() and not all(c.isalnum() or c == "_" for c in v):
-            raise ValueError(
-                "task_id must be a valid Python-style identifier or slug"
-            )
+            raise ValueError("task_id must be a valid Python-style identifier or slug")
         return v
 
 
@@ -177,25 +175,36 @@ class SandboxConfig(BaseModel):
     )
     blocked_commands: list[str] = Field(
         default_factory=lambda: [
-            "rm -rf /", "mkfs", "dd if=", ">:", "chmod 777",
-            "chmod -R 777", "chown root", ":(){ :|:& };:",
-            "fork bomb", "nohup", "shutdown", "reboot", "halt", "poweroff",
+            "rm -rf /",
+            "mkfs",
+            "dd if=",
+            ">:",
+            "chmod 777",
+            "chmod -R 777",
+            "chown root",
+            ":(){ :|:& };:",
+            "fork bomb",
+            "nohup",
+            "shutdown",
+            "reboot",
+            "halt",
+            "poweroff",
         ],
-        description = "Dangerous commands that are always rejected.",
+        description="Dangerous commands that are always rejected.",
     )
     timeout_seconds: int = Field(
         default=60,
-        description = "Maximum wall-clock time per command.",
+        description="Maximum wall-clock time per command.",
         ge=1,
         le=300,
     )
     working_directory: str = Field(
         default="/tmp",  # noqa: S108 — sandbox default, overridable
-        description = "CWD for executed commands.",
+        description="CWD for executed commands.",
     )
     max_output_bytes: int = Field(
         default=1_048_576,  # 1 MiB
-        description = "Maximum combined stdout+stderr before truncation.",
+        description="Maximum combined stdout+stderr before truncation.",
     )
 
 
@@ -207,15 +216,15 @@ class PipelineState(BaseModel):
     request_id: str = Field(..., description="Unique pipeline invocation ID.")
     tasks: dict[str, Task] = Field(
         default_factory=dict,
-        description = "task_id -> Task mapping.",
+        description="task_id -> Task mapping.",
     )
     task_order: list[str] = Field(
         default_factory=list,
-        description = "Topologically sorted task IDs.",
+        description="Topologically sorted task IDs.",
     )
     current_index: int = Field(
         default=0,
-        description = "Index into task_order of the currently executing task.",
+        description="Index into task_order of the currently executing task.",
     )
     completed: bool = Field(default=False)
     failed: bool = Field(default=False)

@@ -283,16 +283,15 @@ class TestPluginRegistryInit:
 class TestPluginRegistryDiscoverDirectory:
     """Tests for PluginRegistry.discover_directory()."""
 
-    def test_discovers_plugin_base_subclasses_in_py_files(
-        self, tmp_path: Path
-    ) -> None:
+    def test_discovers_plugin_base_subclasses_in_py_files(self, tmp_path: Path) -> None:
         """discover_directory finds PluginBase subclasses in .py files."""
         plugin_dir = tmp_path / "plugins"
         plugin_dir.mkdir()
 
         # Write a plugin module with a valid PluginBase subclass
         plugin_path = plugin_dir / "my_plugin.py"
-        plugin_path.write_text(textwrap.dedent("""\
+        plugin_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class MyPlugin(PluginBase):
@@ -302,7 +301,8 @@ class TestPluginRegistryDiscoverDirectory:
 
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
         discovered = registry.discover_directory(str(plugin_dir))
@@ -325,7 +325,8 @@ class TestPluginRegistryDiscoverDirectory:
 
         # __init__.py with a PluginBase subclass (should be ignored)
         init_path = plugin_dir / "__init__.py"
-        init_path.write_text(textwrap.dedent("""\
+        init_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class HiddenPlugin(PluginBase):
@@ -333,7 +334,8 @@ class TestPluginRegistryDiscoverDirectory:
 
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
         discovered = registry.discover_directory(str(plugin_dir))
@@ -347,7 +349,8 @@ class TestPluginRegistryDiscoverDirectory:
 
         # _private.py should be ignored
         private_path = plugin_dir / "_private.py"
-        private_path.write_text(textwrap.dedent("""\
+        private_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class PrivatePlugin(PluginBase):
@@ -355,7 +358,8 @@ class TestPluginRegistryDiscoverDirectory:
 
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
         discovered = registry.discover_directory(str(plugin_dir))
@@ -374,7 +378,8 @@ class TestPluginRegistryDiscoverDirectory:
         plugin_dir.mkdir()
 
         plugin_path = plugin_dir / "multi.py"
-        plugin_path.write_text(textwrap.dedent("""\
+        plugin_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class PluginA(PluginBase):
@@ -388,7 +393,8 @@ class TestPluginRegistryDiscoverDirectory:
 
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
         discovered = registry.discover_directory(str(plugin_dir))
@@ -403,7 +409,8 @@ class TestPluginRegistryDiscoverDirectory:
         plugin_dir.mkdir()
 
         plugin_path = plugin_dir / "mixed.py"
-        plugin_path.write_text(textwrap.dedent("""\
+        plugin_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class RegularClass:
@@ -414,7 +421,8 @@ class TestPluginRegistryDiscoverDirectory:
 
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
         discovered = registry.discover_directory(str(plugin_dir))
@@ -422,21 +430,21 @@ class TestPluginRegistryDiscoverDirectory:
         assert discovered == ["real_plugin"]
         assert "not_really" not in discovered
 
-    def test_plugin_without_explicit_name_uses_class_name(
-        self, tmp_path: Path
-    ) -> None:
+    def test_plugin_without_explicit_name_uses_class_name(self, tmp_path: Path) -> None:
         """Plugin without plugin_name attribute uses the class name."""
         plugin_dir = tmp_path / "plugins"
         plugin_dir.mkdir()
 
         plugin_path = plugin_dir / "anon.py"
-        plugin_path.write_text(textwrap.dedent("""\
+        plugin_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class AnonPlugin(PluginBase):
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
         discovered = registry.discover_directory(str(plugin_dir))
@@ -490,7 +498,8 @@ class TestPluginRegistryDiscoverPackage:
 
                 def on_load(self) -> None:
                     pass
-            """)
+            """
+        )
 
         # Build a real module for the test
         test_pkg_dir = Path(__file__).parent
@@ -587,12 +596,20 @@ class TestPluginRegistryLoadAll:
         """load_all() loads every discovered plugin using module-level classes."""
         registry = PluginRegistry()
         registry._discovered["p1"] = PluginInfo(
-            name="p1", version="1.0", description="",
-            class_name="ModulePlugin1", module_path=__name__, source="test",
+            name="p1",
+            version="1.0",
+            description="",
+            class_name="ModulePlugin1",
+            module_path=__name__,
+            source="test",
         )
         registry._discovered["p2"] = PluginInfo(
-            name="p2", version="1.0", description="",
-            class_name="ModulePlugin2", module_path=__name__, source="test",
+            name="p2",
+            version="1.0",
+            description="",
+            class_name="ModulePlugin2",
+            module_path=__name__,
+            source="test",
         )
 
         loaded = registry.load_all()
@@ -604,12 +621,20 @@ class TestPluginRegistryLoadAll:
         """load_all() returns only names that loaded successfully."""
         registry = PluginRegistry()
         registry._discovered["good"] = PluginInfo(
-            name="good", version="1.0", description="",
-            class_name="ModuleLevelPlugin", module_path=__name__, source="test",
+            name="good",
+            version="1.0",
+            description="",
+            class_name="ModuleLevelPlugin",
+            module_path=__name__,
+            source="test",
         )
         registry._discovered["bad"] = PluginInfo(
-            name="bad", version="1.0", description="",
-            class_name="NoSuchClass", module_path=__name__, source="test",
+            name="bad",
+            version="1.0",
+            description="",
+            class_name="NoSuchClass",
+            module_path=__name__,
+            source="test",
         )
 
         loaded = registry.load_all()
@@ -658,8 +683,12 @@ class TestPluginRegistryUnload:
         """After unload, a plugin can be loaded again."""
         registry = PluginRegistry()
         info = PluginInfo(
-            name="reloadable", version="1.0", description="",
-            class_name="ModuleLevelPlugin", module_path=__name__, source="test",
+            name="reloadable",
+            version="1.0",
+            description="",
+            class_name="ModuleLevelPlugin",
+            module_path=__name__,
+            source="test",
         )
         registry._discovered["reloadable"] = info
 
@@ -795,8 +824,12 @@ class TestPluginRegistryBroadcast:
 
         registry = PluginRegistry()
         registry._discovered["silent"] = PluginInfo(
-            name="silent", version="1.0", description="",
-            class_name="SilentPlugin", module_path=__name__, source="test",
+            name="silent",
+            version="1.0",
+            description="",
+            class_name="SilentPlugin",
+            module_path=__name__,
+            source="test",
         )
         registry.on_pipeline_start("req-1")
         assert calls == []
@@ -842,12 +875,20 @@ class TestPluginRegistryQuery:
         assert registry.discovered_names == []
 
         registry._discovered["a"] = PluginInfo(
-            name="a", version="1", description="", class_name="A",
-            module_path="x", source="test",
+            name="a",
+            version="1",
+            description="",
+            class_name="A",
+            module_path="x",
+            source="test",
         )
         registry._discovered["b"] = PluginInfo(
-            name="b", version="1", description="", class_name="B",
-            module_path="x", source="test",
+            name="b",
+            version="1",
+            description="",
+            class_name="B",
+            module_path="x",
+            source="test",
         )
         assert sorted(registry.discovered_names) == ["a", "b"]
 
@@ -893,15 +934,14 @@ class TestPluginRegistryQuery:
 class TestPluginRegistryEndToEnd:
     """End-to-end tests using tmp_path with real plugin files."""
 
-    def test_full_discover_load_broadcast_unload_cycle(
-        self, tmp_path: Path
-    ) -> None:
+    def test_full_discover_load_broadcast_unload_cycle(self, tmp_path: Path) -> None:
         """Full lifecycle: discover from directory, load, broadcast, unload."""
         plugin_dir = tmp_path / "plugins"
         plugin_dir.mkdir()
 
         plugin_path = plugin_dir / "my_plg.py"
-        plugin_path.write_text(textwrap.dedent("""\
+        plugin_path.write_text(
+            textwrap.dedent("""\
             from no_slop_harness.plugin import PluginBase
 
             class MyPlugin(PluginBase):
@@ -911,7 +951,8 @@ class TestPluginRegistryEndToEnd:
 
                 def on_load(self) -> None:
                     pass
-            """))
+            """)
+        )
 
         registry = PluginRegistry()
 
@@ -946,7 +987,8 @@ class TestPluginRegistryEndToEnd:
 
         for i in range(3):
             p = plugin_dir / f"plugin_{i}.py"
-            p.write_text(textwrap.dedent(f"""\
+            p.write_text(
+                textwrap.dedent(f"""\
                 from no_slop_harness.plugin import PluginBase
 
                 class Plugin{i}(PluginBase):
@@ -954,7 +996,8 @@ class TestPluginRegistryEndToEnd:
 
                     def on_load(self) -> None:
                         pass
-                """))
+                """)
+            )
 
         registry = PluginRegistry()
         registry.discover_directory(str(plugin_dir))

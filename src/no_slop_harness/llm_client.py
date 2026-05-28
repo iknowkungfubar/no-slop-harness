@@ -223,7 +223,7 @@ class LLMClient:
                 )
 
             if attempt < self.config.max_retries - 1:
-                delay = self.config.retry_delay_seconds * (2 ** attempt)
+                delay = self.config.retry_delay_seconds * (2**attempt)
                 await asyncio.sleep(delay)
 
         self._error_counter.inc()

@@ -34,7 +34,9 @@ def world():
         assert '"new"' in file_path.read_text()
         assert '"old"' not in file_path.read_text()
 
-    def test_edit_nonexistent_function_returns_false(self, editor: ASTEditor, tmp_path: Path) -> None:  # noqa: E501
+    def test_edit_nonexistent_function_returns_false(
+        self, editor: ASTEditor, tmp_path: Path
+    ) -> None:  # noqa: E501
         file_path = tmp_path / "test.py"
         file_path.write_text("def hello(): pass\n")
         result = editor.edit(file_path, "nonexistent", "def nonexistent(): pass\n")

@@ -11,13 +11,16 @@ from no_slop_harness.schemas import SandboxConfig
 class TestSandboxBlockedCommands:
     """Implicitly blocked commands cannot be executed."""
 
-    @pytest.mark.parametrize("dangerous_cmd", [
-        "rm -rf /",
-        "echo 'mkfs' && mkfs",
-        "chmod 777 /etc/passwd",
-        "chmod -R 777 /tmp",
-        "chown root:root /etc/shadow",
-    ])
+    @pytest.mark.parametrize(
+        "dangerous_cmd",
+        [
+            "rm -rf /",
+            "echo 'mkfs' && mkfs",
+            "chmod 777 /etc/passwd",
+            "chmod -R 777 /tmp",
+            "chown root:root /etc/shadow",
+        ],
+    )
     def test_dangerous_commands_blocked(self, dangerous_cmd: str) -> None:
         config = SandboxConfig()
         with pytest.raises(SandboxViolation):

@@ -30,6 +30,7 @@ class ASTEditor:
     def _try_init_tree_sitter(self) -> None:
         try:
             import tree_sitter  # noqa: F401
+
             self._available = True
         except ImportError:
             self._available = False
@@ -89,7 +90,7 @@ class ASTEditor:
         if not match:
             return False
 
-        new_content = content[:match.start()] + replacement + content[match.end():]
+        new_content = content[: match.start()] + replacement + content[match.end() :]
 
         # Syntax validation for Python
         try:

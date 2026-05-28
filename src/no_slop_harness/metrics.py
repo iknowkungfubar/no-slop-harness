@@ -229,9 +229,7 @@ class MetricsRegistry:
     ) -> Histogram:
         """Get or create a histogram."""
         if name not in self._histograms:
-            self._histograms[name] = Histogram(
-                name=name, buckets=buckets, description=description
-            )
+            self._histograms[name] = Histogram(name=name, buckets=buckets, description=description)
         return self._histograms[name]
 
     def report(self) -> dict:

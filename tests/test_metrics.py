@@ -98,9 +98,9 @@ class TestHistogram:
 
     def test_custom_buckets(self) -> None:
         h = Histogram("test_hist", buckets=(10, 50, 100))
-        h.observe(5)    # goes in le_10
-        h.observe(25)   # goes in le_50
-        h.observe(75)   # goes in le_100
+        h.observe(5)  # goes in le_10
+        h.observe(25)  # goes in le_50
+        h.observe(75)  # goes in le_100
         h.observe(200)  # overflow
 
         snap = h.snapshot()

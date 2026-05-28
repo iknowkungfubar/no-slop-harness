@@ -43,7 +43,9 @@ class TestFullCIVPipeline:
             ),
         ]
 
-    def test_full_pipeline_happy_path(self, pipeline: PipelineOrchestrator, tasks: list[Task]) -> None:  # noqa: E501
+    def test_full_pipeline_happy_path(
+        self, pipeline: PipelineOrchestrator, tasks: list[Task]
+    ) -> None:  # noqa: E501
         """All tasks execute and verify successfully."""
         # Plan
         msg = pipeline.ingest_tasks(tasks)
@@ -66,7 +68,9 @@ class TestFullCIVPipeline:
         assert executed == 4
         assert pipeline.state.completed
 
-    def test_full_pipeline_with_failure(self, pipeline: PipelineOrchestrator, tasks: list[Task]) -> None:  # noqa: E501
+    def test_full_pipeline_with_failure(
+        self, pipeline: PipelineOrchestrator, tasks: list[Task]
+    ) -> None:  # noqa: E501
         """A failing task should stop the pipeline."""
         msg = pipeline.ingest_tasks(tasks)
         assert msg.phase == "plan"
@@ -88,7 +92,9 @@ class TestFullCIVPipeline:
         assert pipeline.state.failed is True
         assert pipeline.state.failure_reason == "Broken!"
 
-    def test_verification_failure_does_not_auto_rollback(self, pipeline: PipelineOrchestrator) -> None:  # noqa: E501
+    def test_verification_failure_does_not_auto_rollback(
+        self, pipeline: PipelineOrchestrator
+    ) -> None:  # noqa: E501
         """Verifer rejection marks task as failed but pipeline continues for other tasks."""
         tasks = [
             Task(task_id="t1", description="Good", action="X"),

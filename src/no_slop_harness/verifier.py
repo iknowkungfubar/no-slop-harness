@@ -9,6 +9,7 @@ from typing import NamedTuple
 
 class VerificationResult(NamedTuple):
     """Result of a verification run — avoids pytest collection clash with TestResult."""
+
     passed: bool
     output: str
     returncode: int

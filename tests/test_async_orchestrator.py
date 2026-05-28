@@ -159,6 +159,7 @@ class TestAsyncOrchestratorRun:
 
     def test_task_timeout(self) -> None:
         """A slow task should timeout."""
+
         async def slow_implement(task: Task) -> str:
             await asyncio.sleep(1.0)
             return "too late"
@@ -242,6 +243,7 @@ class TestAsyncOrchestratorRun:
 
     def test_failed_dependency_blocks_downstream(self) -> None:
         """When a dependency fails, downstream tasks should not execute."""
+
         async def fail_first(task: Task) -> str:
             if task.task_id == "t1":
                 raise RuntimeError("t1 failed")

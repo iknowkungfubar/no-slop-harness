@@ -39,7 +39,9 @@ class PipelineOrchestrator:
 
     # --- Coordinator phase -------------------------------------------------
 
-    def ingest_tasks(self, tasks: list[Task], deps: list[TaskDependency] | None = None) -> CIVMessage:  # noqa: E501
+    def ingest_tasks(
+        self, tasks: list[Task], deps: list[TaskDependency] | None = None
+    ) -> CIVMessage:  # noqa: E501
         """Accept the task plan from the Coordinator."""
         for t in tasks:
             self.state.tasks[t.task_id] = t
@@ -204,9 +206,13 @@ class PipelineOrchestrator:
         return {
             "request_id": self.request_id,
             "total_tasks": len(self.state.tasks),
-            "completed": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.COMPLETED),  # noqa: E501
+            "completed": sum(
+                1 for t in self.state.tasks.values() if t.status == TaskStatus.COMPLETED
+            ),  # noqa: E501
             "failed": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.FAILED),
-            "in_progress": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.IN_PROGRESS),  # noqa: E501
+            "in_progress": sum(
+                1 for t in self.state.tasks.values() if t.status == TaskStatus.IN_PROGRESS
+            ),  # noqa: E501
             "pending": sum(1 for t in self.state.tasks.values() if t.status == TaskStatus.PENDING),
             "all_done": self.state.completed or self.state.failed,
         }
