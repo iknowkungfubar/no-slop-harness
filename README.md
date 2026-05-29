@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.png" alt="No-Slop Harness Banner" width="100%" />
+</p>
+
 # No-Slop Harness
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
