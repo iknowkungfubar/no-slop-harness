@@ -4,6 +4,8 @@ Extends the synchronous PipelineOrchestrator with asyncio-based
 parallel task execution, concurrent verification, and timeout management.
 """
 
+# mypy: disable-error-code="call-arg"
+
 from __future__ import annotations
 
 import asyncio

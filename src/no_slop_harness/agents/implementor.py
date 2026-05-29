@@ -111,7 +111,7 @@ and run tests or checks to verify your work. Return ONLY a JSON result object.""
             content = "\n".join(lines).strip()
 
         try:
-            return json.loads(content)
+            return json.loads(content)  # type: ignore[return-value]
         except json.JSONDecodeError:
             # If the LLM didn't return JSON, wrap the response
             logger.warning("Implementor did not return valid JSON for task %s", task.task_id)

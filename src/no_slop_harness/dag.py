@@ -41,11 +41,11 @@ def topological_sort(tasks: Sequence[Task], deps: Sequence[TaskDependency]) -> l
                 in_degree[task.task_id] += 1
 
     # Stable sort by priority (desc), then task_id (asc) for determinism
-    queue = sorted(
+    sorted_roots = sorted(
         [tid for tid, deg in in_degree.items() if deg == 0],
         key=lambda tid: (-next(t.priority for t in tasks if t.task_id == tid), tid),
     )
-    queue = deque(queue)
+    queue: deque[str] = deque(sorted_roots)
     result: list[str] = []
 
     while queue:

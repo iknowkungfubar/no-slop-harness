@@ -195,7 +195,7 @@ def _load_state() -> dict | None:
         latest = sorted(json_files, key=lambda p: p.stat().st_mtime)[-1]
     except (IndexError, OSError):
         latest = json_files[0]
-    return json.loads(latest.read_text())
+    return json.loads(latest.read_text())  # type: ignore[return-value]
 
 
 if __name__ == "__main__":

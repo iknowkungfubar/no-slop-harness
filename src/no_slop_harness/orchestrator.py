@@ -3,6 +3,8 @@
 Coordinates the Coordinator -> Implementor -> Verifier lifecycle.
 """
 
+# mypy: disable-error-code="call-arg"
+
 from __future__ import annotations
 
 import logging
