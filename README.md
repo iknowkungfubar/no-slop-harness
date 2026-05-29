@@ -97,48 +97,49 @@ no-slop status
 
 ### Programmatic Usage
 
+**Synchronous (core only):**
+
 ```python
 from no_slop_harness.orchestrator import PipelineOrchestrator
 from no_slop_harness.schemas import Task, SandboxConfig
 
-# Configure sandbox security
 sandbox = SandboxConfig(
     allowed_commands=["echo", "python", "pytest"],
     timeout_seconds=120,
 )
 
-# Create pipeline
 pipeline = PipelineOrchestrator(sandbox_config=sandbox)
 
-# Ingest tasks (from Coordinator/LLM)
 tasks = [
     Task(task_id="add_model", description="Create User model", action="Add SQLAlchemy model"),
     Task(task_id="add_tests", description="Add unit tests", action="Write pytest suite", dependencies=["add_model"]),
 ]
 msg = pipeline.ingest_tasks(tasks)
 
-# Execute and verify each task
 while task := pipeline.next_task():
-    # ... LLM implements task ...
-    pipeline.report_result(task.task_id, result_output, success=True)
+    pipeline.report_result(task.task_id, "done", success=True)
     pipeline.verify_task(task.task_id)
-    ```bash
-    # Using the full pipeline (requires an LLM endpoint)
-    python -c "
-    import asyncio
-    from no_slop_harness.runner import CIVPipeline
+    pipeline.verification_complete(task.task_id, passed=True)
 
-    async def main():
-        pipeline = CIVPipeline(
-            base_url='http://localhost:1234/v1',
-            model='qwen/qwen3.6-35b-a3b',
-        )
-        result = await pipeline.run('Add a hello() function to demo.py')
-        print(result['success'], result['summary'])
+print(pipeline.status())
+```
 
-    asyncio.run(main())
-    "
-    ```
+**Full pipeline with LLM (requires `[inference]`):**
+
+```python
+import asyncio
+from no_slop_harness.runner import CIVPipeline
+
+async def main():
+    pipeline = CIVPipeline(
+        base_url="http://localhost:1234/v1",
+        model="qwen/qwen3.6-35b-a3b",
+    )
+    result = await pipeline.run("Add a hello() function to demo.py")
+    print(result["success"], result["summary"])
+
+asyncio.run(main())
+```
 
 ## Architecture
 
