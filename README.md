@@ -48,17 +48,17 @@ sudo pacman -S pipx        # Arch
 sudo apt install pipx       # Debian/Ubuntu
 sudo dnf install pipx       # Fedora
 
-# Install no-slop-harness
-pipx install no-slop-harness[inference]
+# Install from GitHub
+pipx install git+https://github.com/iknowkungfubar/no-slop-harness.git
 
-# Or with constrained decoding
-pipx install no-slop-harness[inference,constrained]
+# Or with inference support (adds httpx for LLM API calls)
+pipx install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]
 ```
 
 **uv** (fast, modern, venv-based)
 
 ```bash
-uv tool install no-slop-harness[inference]
+uv tool install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]
 ```
 
 **venv** (traditional, works everywhere)
@@ -66,14 +66,16 @@ uv tool install no-slop-harness[inference]
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install no-slop-harness[inference]
+pip install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]
 ```
 
 **pip --break-system-packages** (quick, not recommended)
 
 ```bash
-pip install --break-system-packages no-slop-harness
+pip install --break-system-packages git+https://github.com/iknowkungfubar/no-slop-harness.git
 ```
+
+> **PyPI coming soon.** These GitHub installs work today. Once published to PyPI, the install becomes `pipx install no-slop-harness[inference]`.
 
 **Extras reference:**
 
@@ -81,7 +83,6 @@ pip install --break-system-packages no-slop-harness
 |-------|------|------|
 | *(none)* | Core: schemas, orchestration, CLI, verifier, plugin system | ~5MB |
 | `[inference]` | `httpx` — OpenAI-compatible LLM API client | +3MB |
-| `[constrained]` | `llguidance` — grammar-enforced JSON output | +2.4MB |
 | `[dev]` | pytest, ruff, mypy — development tools | +15MB |
 
 ### Basic Usage
