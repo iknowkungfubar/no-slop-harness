@@ -224,7 +224,7 @@ class PluginRegistry:
             instance._loaded = True
             self._loaded[name] = instance
             logger.info("Loaded plugin: %s v%s", name, info.version)
-            return instance  # type: ignore[return-value]
+            return instance  # type: ignore[no-any-return]
         except Exception as e:
             logger.error("Failed to load plugin %s: %s", name, e)
             return None
