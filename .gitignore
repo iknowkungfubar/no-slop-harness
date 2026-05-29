@@ -56,3 +56,12 @@ models/
 
 # Noisy editor files
 .directory
+
+# Environment files (secrets!)
+.env
+.env.*
+!.env.example
+
+# Mypy
+.mypy_cache/
+.ruff_cache/
