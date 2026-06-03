@@ -65,6 +65,13 @@ models/
 # Pipeline state files (may contain file paths, config, and secrets)
 .no-slop/
 
+# Agent artifacts (moved to .hermes/artifacts/)
+/AGENTS.md
+/RULES.md
+
+# Hermes agent data directory
+.hermes/
+
 # Mypy
 .mypy_cache/
 .ruff_cache/

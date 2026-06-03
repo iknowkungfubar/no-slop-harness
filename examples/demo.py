@@ -26,18 +26,22 @@ from no_slop_harness.runner import CIVPipeline
 
 
 async def main() -> None:
-    request = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "Add a hello() function to /tmp/demo.py that returns 'Hello, World!'"
+    request = (
+        " ".join(sys.argv[1:])
+        if len(sys.argv) > 1
+        else "Add a hello() function to /tmp/demo.py that returns 'Hello, World!'"
+    )
 
     base_url = os.environ.get("NO_SLOP_API_URL", "http://localhost:1234/v1")
     model = os.environ.get("NO_SLOP_MODEL", "qwen/qwen3.6-35b-a3b")
     api_key = os.environ.get("NO_SLOP_API_KEY", "not-needed")
 
-    print(f"╔══════════════════════════════════════════════════╗")
-    print(f"║   No-Slop Harness — CIV Pipeline Demo           ║")
-    print(f"╠══════════════════════════════════════════════════╣")
+    print("╔══════════════════════════════════════════════════╗")
+    print("║   No-Slop Harness — CIV Pipeline Demo           ║")
+    print("╠══════════════════════════════════════════════════╣")
     print(f"║ API: {base_url:<42} ║")
     print(f"║ Model: {model:<40} ║")
-    print(f"╚══════════════════════════════════════════════════╝")
+    print("╚══════════════════════════════════════════════════╝")
     print()
     print(f"Request: {request}")
     print()
@@ -62,9 +66,11 @@ async def main() -> None:
         print("─" * 55)
         print(f"Success: {result['success']}")
         print(f"Request ID: {result['request_id']}")
-        print(f"Tasks: {result['tasks_total']} total, "
-              f"{result['tasks_completed']} completed, "
-              f"{result['tasks_failed']} failed")
+        print(
+            f"Tasks: {result['tasks_total']} total, "
+            f"{result['tasks_completed']} completed, "
+            f"{result['tasks_failed']} failed"
+        )
         print()
 
         if result.get("task_results"):

@@ -23,12 +23,16 @@ def git_repo(tmp_path):
         capture_output=True,
     )  # noqa: E501, S603, S607
     subprocess.run(  # noqa: S603
-        ["git", "-C", str(repo), "config", "user.name", "Test"], check=True, capture_output=True  # noqa: S607
+        ["git", "-C", str(repo), "config", "user.name", "Test"],
+        check=True,
+        capture_output=True,  # noqa: S607
     )  # noqa: E501, S603, S607
     (repo / "README.md").write_text("# Test Repo\n")
     subprocess.run(["git", "-C", str(repo), "add", "."], check=True, capture_output=True)  # noqa: S603, S607
     subprocess.run(  # noqa: S603
-        ["git", "-C", str(repo), "commit", "-m", "initial"], check=True, capture_output=True  # noqa: S607
+        ["git", "-C", str(repo), "commit", "-m", "initial"],
+        check=True,
+        capture_output=True,  # noqa: S607
     )  # noqa: E501, S603, S607
     return repo
 
@@ -70,7 +74,9 @@ class TestWorktreeIsolation:
         # Make a change in the worktree
         (ctx.worktree_path / "new_file.txt").write_text("hello")
         subprocess.run(  # noqa: S603
-            ["git", "-C", str(ctx.worktree_path), "add", "."], check=True, capture_output=True  # noqa: S607
+            ["git", "-C", str(ctx.worktree_path), "add", "."],
+            check=True,
+            capture_output=True,  # noqa: S607
         )  # noqa: E501, S603, S607
         subprocess.run(  # noqa: S603
             ["git", "-C", str(ctx.worktree_path), "commit", "-m", "feat: add file"],  # noqa: S607
@@ -92,7 +98,9 @@ class TestWorktreeIsolation:
 
         (ctx.worktree_path / "junk.txt").write_text("should be discarded")
         subprocess.run(  # noqa: S603
-            ["git", "-C", str(ctx.worktree_path), "add", "."], check=True, capture_output=True  # noqa: S607
+            ["git", "-C", str(ctx.worktree_path), "add", "."],
+            check=True,
+            capture_output=True,  # noqa: S607
         )  # noqa: E501, S603, S607
         subprocess.run(  # noqa: S603
             ["git", "-C", str(ctx.worktree_path), "commit", "-m", "junk"],  # noqa: S607

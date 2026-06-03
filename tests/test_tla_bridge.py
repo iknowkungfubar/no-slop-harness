@@ -67,4 +67,4 @@ class TestTLCChecker:
     def test_tlc_availability_is_bool(self) -> None:
         checker = TLCChecker()
         jar = checker._find_jar()  # type: ignore[attr-defined]
-        assert isinstance(jar, (str, type(None)))
+        assert isinstance(jar, str | None)
