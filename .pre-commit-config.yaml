@@ -23,6 +23,7 @@ repos:
     hooks:
       - id: mypy
         args: [--ignore-missing-imports]
+        files: ^src/
         additional_dependencies:
           - pydantic>=2.0
           - click>=8.0

@@ -131,7 +131,10 @@ and run tests or checks to verify your work. Return ONLY a JSON result object.""
             allowed = self._work_dir.resolve()
             # Reject paths outside the working directory (path traversal guard)
             if allowed not in target.parents and target != allowed:
-                return f"Error: path '{path}' resolves outside the working directory '{self._work_dir}'"
+                return (
+                    f"Error: path '{path}' resolves outside"
+                    f" the working directory '{self._work_dir}'"
+                )
             return target.read_text()
         except Exception as e:
             return f"Error reading {path}: {e}"
