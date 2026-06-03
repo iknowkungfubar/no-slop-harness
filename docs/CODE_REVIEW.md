@@ -1,7 +1,7 @@
 # Comprehensive Code Review — no-slop-harness
 
-**Reviewer:** Automated SWE Team Review  
-**Date:** 2026-05-28  
+**Reviewer:** Automated SWE Team Review
+**Date:** 2026-05-28
 **Review Scope:** Full repository audit — documentation completeness, architectural soundness, implementation gaps, security, testability, production readiness.
 
 ---

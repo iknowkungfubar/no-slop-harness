@@ -8,7 +8,7 @@ The framework operates on a strict, synchronous lifecycle:
 
 ### 2.1 Inference Layer
 *   **Engine:** `vLLM` optimized for KV-cache reuse across agent loops.
-*   **Hardware Profile:** Optimized for consumer hardware (e.g., AMD RX 7900 GRE class). 
+*   **Hardware Profile:** Optimized for consumer hardware (e.g., AMD RX 7900 GRE class).
 *   **Quantization:** GGUF Q4_K_M for maximum memory bandwidth efficiency.
 
 ### 2.2 Constrained Decoding (Slop Prevention)

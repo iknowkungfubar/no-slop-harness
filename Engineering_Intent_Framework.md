@@ -1,6 +1,6 @@
 # Engineering Intent: A Comprehensive Framework for Eliminating Synthetic Attrition and Orchestrating High-Fidelity Local Agentic Systems
 
-The emergence of large language models has fundamentally altered the landscape of digital content, introducing a critical challenge identified as *AI slop*. This phenomenon refers to the high-volume production of low-quality, unoriginal, and often meaningless digital content generated through artificial intelligence. For organizations and developers committed to the principles of Free and Open Source Software (FOSS) and local inference, the elimination of slop is not merely a stylistic preference; it is a technical prerequisite for maintaining the integrity of software engineering and corporate operations. 
+The emergence of large language models has fundamentally altered the landscape of digital content, introducing a critical challenge identified as *AI slop*. This phenomenon refers to the high-volume production of low-quality, unoriginal, and often meaningless digital content generated through artificial intelligence. For organizations and developers committed to the principles of Free and Open Source Software (FOSS) and local inference, the elimination of slop is not merely a stylistic preference; it is a technical prerequisite for maintaining the integrity of software engineering and corporate operations.
 
 The transition from general-purpose chat interfaces to specialized, minimalist agentic harnesses represents the primary defensive strategy against this synthetic attrition. By prioritizing deterministic control, token efficiency, and verifiable grounding, it is possible to architect systems that are fundamentally "slop-proof."
 
@@ -23,7 +23,7 @@ Therefore, a no-slop strategy must focus on enhancing a model’s knowledge acce
 
 The most effective method for harnessing "wild and unruly" LLM inferences is the deployment of a minimalist agentic harness. A harness acts as a tooling abstraction layer that guides the model's effort toward a specific task. The Pi-Mono framework (pi.dev) serves as a primary reference for this architectural design.
 
-Pi-Mono distinguishes itself through a "tiny core" philosophy, utilizing a system prompt of less than 1,000 tokens. This reduction in upfront instruction cost translates to higher token efficiency and a larger effective context window for reasoning. 
+Pi-Mono distinguishes itself through a "tiny core" philosophy, utilizing a system prompt of less than 1,000 tokens. This reduction in upfront instruction cost translates to higher token efficiency and a larger effective context window for reasoning.
 
 | Component | Function | Technical Implementation |
 | :--- | :--- | :--- |
@@ -32,7 +32,7 @@ Pi-Mono distinguishes itself through a "tiny core" philosophy, utilizing a syste
 | **@mariozechner/pi-tui** | Differential Rendering | Flicker-free terminal UI inspired by React diffing |
 | **@mariozechner/pi-web-ui** | Specialized Components | Streaming displays and tool visualizations |
 
-Unlike feature-heavy agents, Pi-Mono provides a minimal toolset consisting of four core operations: `read`, `write`, `edit`, and `bash`. It provides an extension system allowing the agent to self-modify in a loop, utilizing TypeScript modules that persist state across sessions. 
+Unlike feature-heavy agents, Pi-Mono provides a minimal toolset consisting of four core operations: `read`, `write`, `edit`, and `bash`. It provides an extension system allowing the agent to self-modify in a loop, utilizing TypeScript modules that persist state across sessions.
 
 ## 3. Constrained Decoding and The Self-Healing Pipeline
 
@@ -78,7 +78,7 @@ For a locally hosted system, performance is limited by memory bandwidth. Token u
 
 ## 6. Advanced Performance Metrics for Continuous Optimization
 
-To ensure the system remains slop-proof over time, the orchestrator must monitor operational efficiency. The goal is to minimize the variance penalty for dialogue rounds, encouraging the system to converge on consistent answers quickly. 
+To ensure the system remains slop-proof over time, the orchestrator must monitor operational efficiency. The goal is to minimize the variance penalty for dialogue rounds, encouraging the system to converge on consistent answers quickly.
 
 Let $R_i$ represent the response in the $i$-th round and $\mu$ the mean response. The system should apply a penalty function $P = \alpha \cdot \sigma^2$ during training or few-shot prompting to reduce inconsistency. Concurrently, entropy $H$ must be minimized to ensure the model provides confident and articulate answers:
 
