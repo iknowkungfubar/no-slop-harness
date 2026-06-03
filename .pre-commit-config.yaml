@@ -22,7 +22,7 @@ repos:
     rev: v1.15.0
     hooks:
       - id: mypy
-        args: [--ignore-missing-imports]
+        args: [--ignore-missing-imports, --disable-error-code, import-untyped]
         files: ^src/
         additional_dependencies:
           - pydantic>=2.0
