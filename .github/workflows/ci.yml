@@ -69,4 +69,4 @@ jobs:
           key: ${{ runner.os }}-gitleaks-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Detect secrets
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
