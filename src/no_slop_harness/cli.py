@@ -59,7 +59,9 @@ def init(sandbox_allowlist: tuple[str, ...], timeout: int, request_id: str | Non
     state_dir = Path(os.environ.get("NO_SLOP_STATE_DIR", ".no-slop"))
     state_dir.mkdir(parents=True, exist_ok=True)
     state_path = state_dir / f"pipeline-{state.request_id}.json"
+    # Restrict permissions to owner-only (may contain file paths, config, secrets)
     state_path.write_text(state.model_dump_json(indent=2))
+    os.chmod(str(state_path), 0o600)
 
     console.print(f"[bold green]Pipeline initialized:[/bold green] {state.request_id}")
     console.print(f"State file: {state_path}")
