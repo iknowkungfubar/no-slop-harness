@@ -58,8 +58,10 @@ class WorktreeIsolation:
         Raises:
             RuntimeError: If git operations fail.
         """
-        branch_name = f"no-slop/{task_id}-{uuid4().hex[:8]}"
-        worktree_path = (self.worktrees_dir or Path(".no-slop/worktrees")) / task_id  # type: ignore[union-attr]
+        # Sanitize task_id to prevent path traversal — strip any directory components
+        safe_task_id = Path(task_id).name
+        branch_name = f"no-slop/{safe_task_id}-{uuid4().hex[:8]}"
+        worktree_path = (self.worktrees_dir or Path(".no-slop/worktrees")) / safe_task_id  # type: ignore[union-attr]
 
         # Clean up any previous worktree with this name
         if worktree_path.exists():

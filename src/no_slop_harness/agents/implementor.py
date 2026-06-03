@@ -125,21 +125,31 @@ and run tests or checks to verify your work. Return ONLY a JSON result object.""
     # ── Tool Methods (for LLM to call explicitly) ─────────────────────────
 
     def read_file(self, path: str) -> str:
-        """Read a file at an absolute path."""
+        """Read a file at an absolute path. Validates the path is within the working directory."""
         try:
-            return Path(path).read_text()
+            target = Path(path).resolve()
+            allowed = self._work_dir.resolve()
+            # Reject paths outside the working directory (path traversal guard)
+            if allowed not in target.parents and target != allowed:
+                return f"Error: path '{path}' resolves outside the working directory '{self._work_dir}'"
+            return target.read_text()
         except Exception as e:
             return f"Error reading {path}: {e}"
 
     def write_file(self, path: str, content: str) -> bool:
-        """Write content to a file."""
+        """Write content to a file. Validates the path is within the working directory."""
         try:
-            p = Path(path)
-            p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_text(content)
+            target = Path(path).resolve()
+            allowed = self._work_dir.resolve()
+            # Reject paths outside the working directory (path traversal guard)
+            if allowed not in target.parents and target != allowed:
+                logger.error("Path traversal blocked: %s is outside %s", path, self._work_dir)
+                return False
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(content)
             # Validate syntax for Python files
-            if p.suffix == ".py":
-                compile(content, str(p), "exec")
+            if target.suffix == ".py":
+                compile(content, str(target), "exec")
             return True
         except SyntaxError as e:
             logger.error("Syntax error in %s: %s", path, e)
