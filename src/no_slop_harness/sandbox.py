@@ -60,10 +60,16 @@ def execute_sandboxed(cmd: str, config: SandboxConfig) -> tuple[int, str, str]:
     working_dir.mkdir(parents=True, exist_ok=True)
 
     try:
+        # Parse command into list form to avoid shell injection.
+        # This replaces `shell=True` which allowed allowlist bypass via
+        # subshells ($(...), `...`), pipes, and chained commands.
+        # If the command requires shell features (pipes, redirects),
+        # create a script file and run it via an allowed interpreter.
+        cmd_parts = shlex.split(cmd)
         t0 = time.monotonic()
-        proc = subprocess.run(  # noqa: S602
-            cmd,
-            shell=True,  # noqa: S602 — intentional: LLM-generated commands need shell
+        proc = subprocess.run(
+            cmd_parts,
+            shell=False,
             cwd=str(working_dir),
             capture_output=True,
             text=True,

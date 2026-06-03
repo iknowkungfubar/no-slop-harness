@@ -37,6 +37,15 @@ class OpenAICompatibleConfig:
     timeout_seconds: float = 120.0
     max_retries: int = 3
 
+    def __repr__(self) -> str:
+        """Redact API key in representations."""
+        key_repr = f"{self.api_key[:4]}..." if self.api_key != "not-needed" else "not-needed"
+        return (
+            f"OpenAICompatibleConfig(base_url={self.base_url!r}, "
+            f"api_key={key_repr}, model={self.model!r}, "
+            f"timeout_seconds={self.timeout_seconds}, max_retries={self.max_retries})"
+        )
+
 
 class OpenAICompatibleProvider(LLMProvider):
     """LLM provider for any OpenAI-compatible chat completions API.
@@ -65,6 +74,7 @@ class OpenAICompatibleProvider(LLMProvider):
                 "Content-Type": "application/json",
             },
             timeout=httpx.Timeout(self.config.timeout_seconds),
+            verify=True,
         )
 
     @property
