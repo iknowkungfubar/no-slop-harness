@@ -26,10 +26,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev,inference]"
+
+      - name: Run pre-commit hooks
+        run: |
+          pip install pre-commit
+          pre-commit run --all-files || true
 
       - name: Lint with ruff
         run: ruff check src/ tests/
@@ -47,6 +61,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Cache gitleaks
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/gitleaks
+          key: ${{ runner.os }}-gitleaks-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Detect secrets
         uses: gitleaks/gitleaks-action@v2

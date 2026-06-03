@@ -6,7 +6,7 @@
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-90%20passed-brightgreen.svg)](tests/)
+[![Tests](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml/badge.svg)](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
 [![Type checking: mypy](https://img.shields.io/badge/type%20checking-mypy-informational.svg)](https://mypy-lang.org/)
 

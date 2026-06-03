@@ -58,7 +58,7 @@ source = ["src/no_slop_harness"]
 omit = ["src/no_slop_harness/__pycache__/*"]
 
 [tool.coverage.report]
-fail_under = 75
+fail_under = 80
 exclude_also = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
