@@ -1,6 +1,6 @@
 # Python build system
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.21,<2.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -12,7 +12,7 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.0,<3.0",
-    "rich>=13.0,<14.0",
+    "rich>=13.0,<16.0",
     "click>=8.0,<9.0",
     "tree-sitter>=0.21.0",
 ]

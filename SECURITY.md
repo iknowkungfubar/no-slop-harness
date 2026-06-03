@@ -38,8 +38,16 @@ No-Slop Harness is a local-first framework. Key security principles:
 
 - **No network by default**: The harness does not make outbound connections unless explicitly configured
 - **Sandboxed execution**: Tool commands run in isolated environments via the sandbox layer
+  - Commands are parsed with `shlex.split()` into list form (no `shell=True`), preventing allowlist bypass via subshells (`$(...)`, `` `...` ``), pipes, and chained commands
+  - Implicit blocklist always prohibits destructive operations (`rm -rf /`, `mkfs`, `shutdown`, etc.)
+  - Configurable allowlist restricts execution to approved commands
+  - Output is truncated at the configured byte limit to prevent memory exhaustion
 - **API keys**: All credentials are read from environment variables or config files excluded from version control (see `.gitignore`)
 - **Input validation**: Task schemas enforce type and constraint validation before execution
+- **Path traversal protection**: File operations in the Implementor agent validate that target paths resolve within the working directory, preventing unauthorized file access
+- **Pipeline state isolation**: State files are persisted with `0o600` (owner-only) permissions and stored in `.no-slop/` (excluded from version control)
+- **Git worktree isolation**: Each task executes in an isolated git worktree; changes are merged only after passing verification, ensuring atomic task boundaries
+- **Secrets redaction**: Accidental secret exposure is minimized via `.gitignore` patterns (`.env`, `.env.*`) and CI gitleaks scanning
 
 ## Hall of Fame
 

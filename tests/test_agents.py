@@ -74,7 +74,7 @@ class TestImplementorAgent:
         client = LLMClient(config=LLMClientConfig(provider="mock"))
         client.register_provider("mock", MockImplementorProvider())
 
-        agent = ImplementorAgent(client)
+        agent = ImplementorAgent(client, work_dir=tmp_path)
         f = tmp_path / "test.txt"
         f.write_text("hello")
 
@@ -84,7 +84,7 @@ class TestImplementorAgent:
         client = LLMClient(config=LLMClientConfig(provider="mock"))
         client.register_provider("mock", MockImplementorProvider())
 
-        agent = ImplementorAgent(client)
+        agent = ImplementorAgent(client, work_dir=tmp_path)
         f = tmp_path / "out.py"
         assert agent.write_file(str(f), "x = 1\n")
         assert f.read_text() == "x = 1\n"
@@ -93,7 +93,7 @@ class TestImplementorAgent:
         client = LLMClient(config=LLMClientConfig(provider="mock"))
         client.register_provider("mock", MockImplementorProvider())
 
-        agent = ImplementorAgent(client)
+        agent = ImplementorAgent(client, work_dir=tmp_path)
         f = tmp_path / "broken.py"
         assert agent.write_file(str(f), "def broken(:\n") is False
 

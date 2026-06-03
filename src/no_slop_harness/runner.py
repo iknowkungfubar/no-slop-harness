@@ -7,7 +7,6 @@ from natural language to verified implementation.
 
 from __future__ import annotations
 
-import asyncio  # noqa: F401
 import logging
 from pathlib import Path
 from typing import Any
