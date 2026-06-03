@@ -51,6 +51,7 @@ ignore = ["S101"]  # noqa: allow assert in tests
 [tool.ruff.lint.per-file-ignores]
 "examples/*" = ["E501"]
 "src/no_slop_harness/sandbox.py" = ["S603"]
+"tests/*" = ["S607"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
