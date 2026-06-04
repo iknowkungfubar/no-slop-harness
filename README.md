@@ -5,6 +5,7 @@
 # No-Slop Harness
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Version](https://img.shields.io/badge/version-0.9.0-blueviolet.svg)](https://github.com/iknowkungfubar/no-slop-harness/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![Tests](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
@@ -79,7 +80,7 @@ pip install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]
 pip install --break-system-packages git+https://github.com/iknowkungfubar/no-slop-harness.git
 ```
 
-> **PyPI coming soon.** These GitHub installs work today. Once published to PyPI, the install becomes `pipx install no-slop-harness[inference]`.
+> **GitHub install.** Not yet on PyPI. `pipx install no-slop-harness[inference]` from GitHub works today.
 
 **Extras reference:**
 
