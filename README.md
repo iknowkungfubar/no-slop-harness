@@ -209,6 +209,10 @@ python -m mypy src/ --ignore-missing-imports
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Development workflow and PR process
 - [CHANGELOG.md](CHANGELOG.md) — Version history
 
+## Contributing
+
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on our development process, coding standards, PR workflow, and code of conduct.
+
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE) for details.
