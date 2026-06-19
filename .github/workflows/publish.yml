@@ -45,8 +45,9 @@ jobs:
       - name: Verify package
         run: twine check dist/*
 
-      - name: Publish to PyPI (via token or OIDC)
+      - name: Publish to PyPI (via token)
         uses: pypa/gh-action-pypi-publish@v1.14.0
         with:
-          # Uses PYPI_TOKEN secret if set, or falls back to OIDC trusted publishing
           password: ${{ secrets.PYPI_TOKEN }}
+          trusted-publishing: false
+          attestations: false
