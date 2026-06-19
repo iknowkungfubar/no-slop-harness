@@ -80,7 +80,12 @@ pip install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]
 pip install --break-system-packages git+https://github.com/iknowkungfubar/no-slop-harness.git
 ```
 
-> **GitHub install.** Not yet on PyPI. `pipx install no-slop-harness[inference]` from GitHub works today.
+> **PyPI install.** `no-slop-harness` is available on PyPI. Install directly:
+> ```bash
+> pipx install no-slop-harness[inference]
+> ```
+>
+> Or from source: `pip install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]`
 
 **Extras reference:**
 

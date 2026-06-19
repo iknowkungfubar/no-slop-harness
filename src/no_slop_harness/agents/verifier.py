@@ -71,13 +71,18 @@ class VerifierAgent:
             "suggestions": "",
         }
 
-        # 1. Run tests
-        if task.target_file:
-            test_result = self._verifier.run_pytest()
-            results["test_output"] = test_result.output
-            if not test_result.passed:
-                results["passed"] = False
-                results["detail"] += "Tests failed. "
+        # 1. Run tests for modified test files (not the full suite)
+        test_files = [f for f in files if Path(f).name.startswith("test_")]
+        if test_files:
+            for tf in test_files:
+                tf_path = Path(tf)
+                if tf_path.exists():
+                    test_result = self._verifier.run_pytest(test_path=tf)
+                    if test_result.output:
+                        results["test_output"] += test_result.output + "\n"
+                    if not test_result.passed:
+                        results["passed"] = False
+                        results["detail"] += f"Tests failed in {tf}. "
 
         # 2. Run linter
         lint_result = self._verifier.run_lint()
