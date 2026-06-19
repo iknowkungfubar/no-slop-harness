@@ -70,16 +70,26 @@ uv tool install git+https://github.com/iknowkungfubar/no-slop-harness.git[infere
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install git+https://github.com/iknowkungfubar/no-slop-harness.git[inference]
+pip install no-slop-harness[inference]
 ```
 
-**pip --break-system-packages** (quick, not recommended)
+**From PyPI (recommended):**
 
 ```bash
-pip install --break-system-packages git+https://github.com/iknowkungfubar/no-slop-harness.git
+pip install no-slop-harness
 ```
 
-> **PyPI coming soon.** These GitHub installs work today. Once published to PyPI, the install becomes `pipx install no-slop-harness[inference]`.
+**With LLM inference support:**
+
+```bash
+pip install "no-slop-harness[inference]"
+```
+
+**pipx (isolated global install):**
+
+```bash
+pipx install "no-slop-harness[inference]"
+```
 
 **Extras reference:**
 
