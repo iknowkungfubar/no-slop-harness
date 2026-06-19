@@ -5,7 +5,7 @@
 # No-Slop Harness
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-0.9.0-blueviolet.svg)](https://github.com/iknowkungfubar/no-slop-harness/releases)
+[![Version](https://img.shields.io/badge/version-0.9.1-blueviolet.svg)](https://github.com/iknowkungfubar/no-slop-harness/releases)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![Tests](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
