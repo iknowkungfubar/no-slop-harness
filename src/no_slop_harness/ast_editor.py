@@ -1,7 +1,8 @@
-"""Tree-sitter powered AST editing (stub).
+"""Regex-based AST editing with tree-sitter backend detection.
 
 Full AST editing requires tree-sitter bindings with language grammars.
-This module provides the interface and a safe fallback implementation.
+This module provides a unified interface: tree-sitter when available,
+regex-based fallback when not.
 """
 
 from __future__ import annotations
@@ -15,11 +16,10 @@ class ASTEditError(Exception):
 
 
 class ASTEditor:
-    """AST-based file editor using tree-sitter.
+    """AST-based file editor using tree-sitter (preferred) or regex fallback.
 
-    In production, this would use tree-sitter to perform precise
-    syntax-aware edits. This stub provides regex-based fallback
-    suitable for well-structured code.
+    Uses tree-sitter when available for precise syntax-aware edits.
+    Falls back to regex-based editing for well-structured code.
     """
 
     def __init__(self, grammar: str = "python") -> None:

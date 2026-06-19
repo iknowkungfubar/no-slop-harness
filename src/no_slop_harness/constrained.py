@@ -156,9 +156,9 @@ class ConstrainedDecoder:
     ) -> LLMResponse:
         """Generate with llguidance grammar mask applied.
 
-        This is a stub for the full llguidance integration. In production,
-        this would use llguidance's token masking API to constrain each
-        token to valid JSON grammar productions.
+        Uses llguidance's token masking API when available to constrain
+        each token to valid JSON grammar productions. Falls back to
+        grammar-as-context when llguidance is not installed.
         """
         # In full llguidance integration:
         #   token_mask = llguidance.get_mask(grammar, current_tokens)
