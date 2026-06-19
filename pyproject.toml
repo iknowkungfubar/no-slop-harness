@@ -42,6 +42,7 @@ Documentation = "https://github.com/iknowkungfubar/no-slop-harness#readme"
 
 [project.scripts]
 no-slop = "no_slop_harness.cli:main"
+turintech-no-slop = "no_slop_harness.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/no_slop_harness"]
