@@ -9,6 +9,10 @@ on:
         description: 'Version to publish'
         required: true
         type: string
+      pypi_token:
+        description: 'PyPI API token (pypi-xxx). Leave empty to use OIDC trusted publishing.'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -41,5 +45,8 @@ jobs:
       - name: Verify package
         run: twine check dist/*
 
-      - name: Publish to PyPI
+      - name: Publish to PyPI (via token or OIDC)
         uses: pypa/gh-action-pypi-publish@v1.14.0
+        with:
+          # Uses PYPI_TOKEN secret if set, or falls back to OIDC trusted publishing
+          password: ${{ secrets.PYPI_TOKEN }}
