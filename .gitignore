@@ -75,3 +75,14 @@ models/
 # Mypy
 .mypy_cache/
 .ruff_cache/
+
+# AI agent artifacts (local context — never committed)
+CLAUDE.md
+SOUL.md
+.cursor/
+.cursorrules
+.windsurfrules
+.opencode/
+.aider*
+COPILOT_INSTRUCTIONS.md
+.claude/
