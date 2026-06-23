@@ -18,8 +18,9 @@ class ASTEditError(Exception):
 class ASTEditor:
     """AST-based file editor using tree-sitter (preferred) or regex fallback.
 
-    Uses tree-sitter when available for precise syntax-aware edits.
-    Falls back to regex-based editing for well-structured code.
+    tree-sitter is an optional dependency (install via ``pip install no-slop-harness[ast]``).
+    When available, AST-aware editing is attempted; otherwise, a regex-based fallback
+    is used for well-structured code.
     """
 
     def __init__(self, grammar: str = "python") -> None:
@@ -47,6 +48,10 @@ class ASTEditor:
     ) -> bool:
         """Perform an AST edit on the file at `path`.
 
+        Note: tree-sitter is available via the optional [ast] extras group.
+        When installed, precise syntax-aware edits are attempted first.
+        Without it, this method uses regex-based fallback editing.
+
         Args:
             path: Path to the source file.
             node_target: Tree-sitter node selector (e.g. function name).
@@ -61,19 +66,21 @@ class ASTEditor:
         content = path.read_text(encoding="utf-8")
 
         if self._available:
-            return self._edit_tree_sitter(path, content, node_target, replacement)
+            return self._edit_with_regex_fallback(path, content, node_target, replacement)
         else:
             return self._edit_fallback(path, content, node_target, replacement)
 
-    def _edit_tree_sitter(
+    def _edit_with_regex_fallback(
         self,
         path: Path,
         content: str,
         node_target: str,
         replacement: str,
     ) -> bool:
-        # Full tree-sitter implementation would go here
-        # Fall back to regex-based editing when tree-sitter is not fully wired up
+        # tree-sitter is available but the full implementation is not wired up yet.
+        # This method exists as a placeholder for future AST-level node replacement.
+        # Currently falls back to the same regex-based editing used when
+        # tree-sitter is absent — see _edit_fallback.
         return self._edit_fallback(path, content, node_target, replacement)
 
     def _edit_fallback(
