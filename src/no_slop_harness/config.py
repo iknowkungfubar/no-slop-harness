@@ -72,7 +72,7 @@ def _load_toml(path: Path) -> dict[str, Any]:
         return {}
     except tomllib.TOMLDecodeError as e:
         import warnings
-        warnings.warn(f"Failed to parse config {path}: {e}")
+        warnings.warn(f"Failed to parse config {path}: {e}", stacklevel=2)
         return {}
 
 

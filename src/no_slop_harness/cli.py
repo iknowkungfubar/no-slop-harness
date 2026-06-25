@@ -11,8 +11,8 @@ from pathlib import Path
 import click
 from rich.console import Console
 from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from no_slop_harness import __version__
 from no_slop_harness.orchestrator import PipelineOrchestrator
@@ -86,7 +86,7 @@ def run(
             _print_json({"status": "error", "message": str(e)})
         else:
             console.print(f"[red]Pipeline execution failed: {e}[/red]")
-        raise click.Abort()
+        raise click.Abort() from e
 
     if _use_json(ctx):
         _print_json(result)
@@ -326,7 +326,7 @@ def verify(ctx: click.Context, task_id: str, passed: bool, detail: str) -> None:
 
     # Record verdict
     detail_str = detail if detail else "; ".join(detail_parts) if detail_parts else ("All checks passed." if actual_passed else "Verification failed.")
-    complete_msg = orchestrator.verification_complete(task_id, actual_passed, detail_str)
+    _ = orchestrator.verification_complete(task_id, actual_passed, detail_str)
 
     # Persist updated state
     _save_state(orchestrator.state)
