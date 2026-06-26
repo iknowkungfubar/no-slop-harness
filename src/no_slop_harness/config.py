@@ -72,13 +72,12 @@ def _load_toml(path: Path) -> dict[str, Any]:
         return {}
     except tomllib.TOMLDecodeError as e:
         import warnings
-        warnings.warn(f"Failed to parse config {path}: {e}")
+
+        warnings.warn(f"Failed to parse config {path}: {e}", stacklevel=2)
         return {}
 
 
-def _merge_section(
-    cfg: dict[str, Any], section: str, defaults: dict[str, Any]
-) -> dict[str, Any]:
+def _merge_section(cfg: dict[str, Any], section: str, defaults: dict[str, Any]) -> dict[str, Any]:
     """Merge a config section from parsed TOML into defaults."""
     raw = cfg.get(section, {})
     if not isinstance(raw, dict):
