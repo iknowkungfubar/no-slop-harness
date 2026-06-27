@@ -11,8 +11,8 @@ from pathlib import Path
 import click
 from rich.console import Console
 from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from no_slop_harness import __version__
 from no_slop_harness.orchestrator import PipelineOrchestrator
@@ -23,7 +23,12 @@ console = Console()
 
 @click.group()
 @click.option("--verbose", "-v", is_flag=True, help="Enable verbose logging.")
-@click.option("--json", "json_flag", is_flag=True, help="Output machine-parseable JSON instead of rich tables.")
+@click.option(
+    "--json",
+    "json_flag",
+    is_flag=True,
+    help="Output machine-parseable JSON instead of rich tables.",
+)
 @click.pass_context
 def main(ctx: click.Context, verbose: bool, json_flag: bool) -> None:
     """No-Slop Harness — deterministic LLM orchestration via the CIV pattern."""
@@ -38,9 +43,13 @@ def main(ctx: click.Context, verbose: bool, json_flag: bool) -> None:
 
 @main.command()
 @click.argument("task", nargs=-1, required=True)
-@click.option("--base-url", default="http://localhost:1234/v1", help="OpenAI-compatible API base URL.")
+@click.option(
+    "--base-url", default="http://localhost:1234/v1", help="OpenAI-compatible API base URL."
+)
 @click.option("--model", default="qwen/qwen3.6-35b-a3b", help="Model name.")
-@click.option("--api-key", default="not-needed", help="API key (default: 'not-needed' for local LM Studio).")
+@click.option(
+    "--api-key", default="not-needed", help="API key (default: 'not-needed' for local LM Studio)."
+)
 @click.option("--timeout", default=120, type=int, help="Command timeout in seconds.")
 @click.pass_context
 def run(
@@ -74,7 +83,9 @@ def run(
             console=console,
             transient=False,
         ) as progress:
-            progress.add_task(description="Coordinating, implementing, and verifying...", total=None)
+            progress.add_task(
+                description="Coordinating, implementing, and verifying...", total=None
+            )
             result = await pipeline.run(task_str)
         await pipeline.close()
         return result
@@ -86,7 +97,7 @@ def run(
             _print_json({"status": "error", "message": str(e)})
         else:
             console.print(f"[red]Pipeline execution failed: {e}[/red]")
-        raise click.Abort()
+        raise click.Abort() from e
 
     if _use_json(ctx):
         _print_json(result)
@@ -194,7 +205,9 @@ def report(ctx: click.Context, task_id: str, result: str, success: bool) -> None
     state = _load_state()
     if state is None:
         if _use_json(ctx):
-            _print_json({"status": "error", "message": "No pipeline state found. Run 'no-slop init' first."})
+            _print_json(
+                {"status": "error", "message": "No pipeline state found. Run 'no-slop init' first."}
+            )
         else:
             console.print("[red]No pipeline state found. Run 'no-slop init' first.[/red]")
         return
@@ -219,7 +232,15 @@ def report(ctx: click.Context, task_id: str, result: str, success: bool) -> None
     if msg.error:
         _save_state(orchestrator.state)
         if _use_json(ctx):
-            _print_json({"status": "error", "task_id": task_id, "message": msg.error, "result": result, "success": success})
+            _print_json(
+                {
+                    "status": "error",
+                    "task_id": task_id,
+                    "message": msg.error,
+                    "result": result,
+                    "success": success,
+                }
+            )
         else:
             console.print(f"[red]Error reporting result: {msg.error}[/red]")
         return
@@ -228,13 +249,15 @@ def report(ctx: click.Context, task_id: str, result: str, success: bool) -> None
     _save_state(orchestrator.state)
 
     if _use_json(ctx):
-        _print_json({
-            "status": "ok",
-            "task_id": task_id,
-            "result": result,
-            "success": success,
-            "next_phase": msg.phase,
-        })
+        _print_json(
+            {
+                "status": "ok",
+                "task_id": task_id,
+                "result": result,
+                "success": success,
+                "next_phase": msg.phase,
+            }
+        )
         return
 
     if success:
@@ -263,7 +286,9 @@ def verify(ctx: click.Context, task_id: str, passed: bool, detail: str) -> None:
     state = _load_state()
     if state is None:
         if _use_json(ctx):
-            _print_json({"status": "error", "message": "No pipeline state found. Run 'no-slop init' first."})
+            _print_json(
+                {"status": "error", "message": "No pipeline state found. Run 'no-slop init' first."}
+            )
         else:
             console.print("[red]No pipeline state found. Run 'no-slop init' first.[/red]")
         return
@@ -325,29 +350,39 @@ def verify(ctx: click.Context, task_id: str, passed: bool, detail: str) -> None:
     actual_passed = passed if has_explicit else all_passed
 
     # Record verdict
-    detail_str = detail if detail else "; ".join(detail_parts) if detail_parts else ("All checks passed." if actual_passed else "Verification failed.")
-    complete_msg = orchestrator.verification_complete(task_id, actual_passed, detail_str)
+    detail_str = (
+        detail
+        if detail
+        else "; ".join(detail_parts)
+        if detail_parts
+        else ("All checks passed." if actual_passed else "Verification failed.")
+    )
+    complete_msg = orchestrator.verification_complete(task_id, actual_passed, detail_str)  # noqa: F841
 
     # Persist updated state
     _save_state(orchestrator.state)
 
     if _use_json(ctx):
-        _print_json({
-            "status": "ok" if actual_passed else "failed",
-            "task_id": task_id,
-            "passed": actual_passed,
-            "detail": detail_str,
-            "test_output": test_result.output if test_result else "",
-            "lint_output": lint_result.output,
-            "typecheck_output": type_result.output,
-        })
+        _print_json(
+            {
+                "status": "ok" if actual_passed else "failed",
+                "task_id": task_id,
+                "passed": actual_passed,
+                "detail": detail_str,
+                "test_output": test_result.output if test_result else "",
+                "lint_output": lint_result.output,
+                "typecheck_output": type_result.output,
+            }
+        )
         return
 
     if actual_passed:
         console.print(f"[green]Task {task_id}: VERIFIED ✓[/green]")
     else:
         console.print(
-            Panel.fit(detail_str or "Verification failed", title=f"[red]Task {task_id}: FAILED[/red]")
+            Panel.fit(
+                detail_str or "Verification failed", title=f"[red]Task {task_id}: FAILED[/red]"
+            )
         )
 
 
