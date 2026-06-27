@@ -171,8 +171,12 @@ class TestCLIVerify:
             },
             "task_order": ["t1"],
         }
-        mock_lint.return_value = VerificationResult(passed=False, output="Lint errors", returncode=1)
-        mock_typecheck.return_value = VerificationResult(passed=False, output="Type errors", returncode=1)
+        mock_lint.return_value = VerificationResult(
+            passed=False, output="Lint errors", returncode=1
+        )
+        mock_typecheck.return_value = VerificationResult(
+            passed=False, output="Type errors", returncode=1
+        )
         result = runner.invoke(main, ["verify", "t1", "--failed", "-d", "Tests failed"])
         assert result.exit_code == 0
         assert "FAILED" in result.output or "Lint errors" in result.output
