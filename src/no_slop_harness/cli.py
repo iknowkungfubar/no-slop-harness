@@ -97,7 +97,7 @@ def run(
             _print_json({"status": "error", "message": str(e)})
         else:
             console.print(f"[red]Pipeline execution failed: {e}[/red]")
-        raise click.Abort()
+        raise click.Abort() from e
 
     if _use_json(ctx):
         _print_json(result)
