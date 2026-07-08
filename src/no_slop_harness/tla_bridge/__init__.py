@@ -15,49 +15,13 @@ import logging
 import shutil
 import subprocess
 import tempfile
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from no_slop_harness.tla_bridge.models import TLCResult, StaticAnalysisResult
+
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Result types
-# ---------------------------------------------------------------------------
-
-
-@dataclass
-class TLCResult:
-    """Outcome of a TLC model-checking run."""
-
-    passed: bool
-    """True when all invariants and temporal properties hold within the
-    configured model bounds."""
-
-    counterexample: str | None = None
-    """Human-readable trace showing the state sequence that violated an
-    invariant, or None when the check passes."""
-
-    stats: dict[str, Any] = field(default_factory=dict)
-    """Arbitrary statistics collected during the run (diameter, states
-    checked, distinct states, etc.)."""
-
-    raw_output: str = ""
-    """Unprocessed stdout+stderr from the TLC process."""
-
-    error: str | None = None
-    """Exception message when TLC could not be invoked at all."""
-
-
-@dataclass
-class StaticAnalysisResult:
-    """Result of the built-in static fallback analysis."""
-
-    passed: bool
-    warnings: list[str] = field(default_factory=list)
-    errors: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
