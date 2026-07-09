@@ -164,7 +164,9 @@ class TestLoadConfig:
         cfg = load_config()
         assert cfg.api.base_url == "http://env-host:9999"
 
-    def test_user_config_takes_lower_priority(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    def test_user_config_takes_lower_priority(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ):
         """User config should be loaded, but project config overrides it."""
         monkeypatch.chdir(tmp_path)
 
