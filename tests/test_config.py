@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-import os
-import tomllib
 from pathlib import Path
 
 import pytest
-
 from src.no_slop_harness.config import (
     APIConfig,
     NoSlopConfig,

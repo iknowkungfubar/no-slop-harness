@@ -19,7 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from no_slop_harness.tla_bridge.models import TLCResult, StaticAnalysisResult
+from no_slop_harness.tla_bridge.models import StaticAnalysisResult, TLCResult
 
 logger = logging.getLogger(__name__)
 
