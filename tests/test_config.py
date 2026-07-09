@@ -73,6 +73,7 @@ class TestLoadToml:
         path = tmp_path / "bad.toml"
         path.write_text("{{invalid [[[toml")
         import warnings
+
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             result = _load_toml(path)
@@ -191,14 +192,10 @@ class TestLoadConfig:
         # User config
         user_config_dir = tmp_path / ".config" / "no-slop"
         user_config_dir.mkdir(parents=True)
-        (user_config_dir / "config.toml").write_text(
-            '[api]\nbase_url = "http://user:5000"\n'
-        )
+        (user_config_dir / "config.toml").write_text('[api]\nbase_url = "http://user:5000"\n')
 
         # Project config
-        (tmp_path / "no-slop.toml").write_text(
-            '[api]\nbase_url = "http://project:8080"\n'
-        )
+        (tmp_path / "no-slop.toml").write_text('[api]\nbase_url = "http://project:8080"\n')
 
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
