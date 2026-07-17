@@ -7,9 +7,11 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Version](https://img.shields.io/pypi/v/no-slop-harness?color=blueviolet&label=version)](https://pypi.org/project/no-slop-harness/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
-[![Tests](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml)
+[![CI](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/iknowkungfubar/no-slop-harness/actions/workflows/codeql.yml)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-261230.svg)](https://github.com/astral-sh/ruff)
 [![Type checking: mypy](https://img.shields.io/badge/type%20checking-mypy-informational.svg)](https://mypy-lang.org/)
+[![Security: gitleaks](https://img.shields.io/badge/security-gitleaks-blue.svg)](https://github.com/gitleaks/gitleaks)
 
 **Deterministic, local-first LLM orchestration framework implementing the CIV (Coordinator-Implementor-Verifier) pattern for zero-slop, high-fidelity software engineering.**
 
