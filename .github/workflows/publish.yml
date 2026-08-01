@@ -48,7 +48,7 @@ jobs:
         env:
           PYPI_TOKEN_SECRET: ${{ secrets.PYPI_TOKEN }}
         if: env.PYPI_TOKEN_SECRET != ''
-        uses: pypa/gh-action-pypi-publish@v1.14.0
+        uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
           # Uses PYPI_TOKEN secret; OIDC disabled until PyPI trusted publisher is configured
           password: ${{ secrets.PYPI_TOKEN }}
