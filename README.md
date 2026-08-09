@@ -176,7 +176,8 @@ src/no_slop_harness/
 ├── constrained.py           # llguidance grammar-enforced JSON output
 ├── rag.py                   # RAG + self-healing hallucination detection
 ├── advanced_metrics.py      # Token entropy, variance penalty, inter-step timing
-├── tla_bridge.py            # TLA+ formal verification bridge (spec gen + TLC)
+├── tla_bridge/              # TLA+ formal verification bridge (spec gen + TLC)
+│   └── models.py            # StaticAnalysisResult, TLCResult result types
 ├── llm_client.py            # LLM provider abstraction with retry logic
 ├── logging_config.py        # Structured logging (JSON formatter, PipelineLogger)
 ├── metrics.py               # Observability (counters, timers, histograms)
